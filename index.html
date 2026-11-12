@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>복사골마라톤클럽 출석부</title>
+    <title>복사골마라톤 일요운동 출석부</title>
     
     <!-- 카카오톡 및 웹 썸네일/아이콘 설정 -->
     <link rel="apple-touch-icon" href="todal_attendance_og.jpg">
@@ -12,14 +12,14 @@
 
     <!-- 🌟 카카오톡 공유 시 미리보기 이미지 및 제목/설정 태그 -->
     <meta property="property" content="website">
-    <meta property="og:title" content="복사골마라톤클럽 출석부">
-    <meta property="og:description" content="토요일 달리기 모임 출석 및 누적현황 관리 시스템">
+    <meta property="og:title" content="복사골마라톤 일요운동 출석부">
+    <meta property="og:description" content="일요일 달리기 모임 출석 및 누적현황 관리 시스템">
     <meta property="og:image" content="https://morningrun.github.io/saturday-attendance/todal_attendance_og.jpg">
     <meta property="og:url" content="https://morningrun.github.io/saturday-attendance/">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="복사골출석부">
+    <meta name="apple-mobile-web-app-title" content="복사골일요출석부">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f172a">
 
@@ -42,7 +42,7 @@
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 12px; border-radius: 14px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08); }
         
         .main-title-box { text-align: center; margin: 8px 0 12px 0; }
-        .main-title { font-size: 1.6rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+        .main-title { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
         
         .tab-group { display: flex; gap: 6px; margin-bottom: 12px; background: #cbd5e1; padding: 3px; border-radius: 10px; position: sticky; top: 6px; z-index: 10; backdrop-filter: blur(8px); }
         .tab-btn { flex: 1; padding: 9px 4px; font-size: 0.9rem; border: none; background: transparent; color: var(--text-sub); font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-align: center; }
@@ -52,20 +52,20 @@
         .month-btn { padding: 7px 10px; font-size: 0.8rem; border: 1px solid var(--border); border-radius: 7px; background: #ffffff; cursor: pointer; font-weight: 700; color: var(--text-sub); }
         .month-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 6px rgba(37,99,235,0.25); }
 
-        .saturday-list-box { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
-        .saturday-list-title { font-size: 0.88rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .saturday-vertical-group { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
+        .sunday-list-box { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
+        .sunday-list-title { font-size: 0.88rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .sunday-vertical-group { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
         
-        /* 모바일 최적화된 토요일 날짜 선택 버튼 */
-        .saturday-item-btn { padding: 10px 12px; background: #ffffff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 4px; transition: all 0.2s; }
-        .saturday-item-btn.active { background: #eff6ff; color: var(--accent); border: 2px solid var(--accent); }
-        .saturday-item-btn.disabled { background: #f1f5f9; color: #94a3b8; border-color: var(--border); cursor: not-allowed; opacity: 0.7; }
+        /* 모바일 최적화된 일요일 날짜 선택 버튼 */
+        .sunday-item-btn { padding: 10px 12px; background: #ffffff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 4px; transition: all 0.2s; }
+        .sunday-item-btn.active { background: #eff6ff; color: var(--accent); border: 2px solid var(--accent); }
+        .sunday-item-btn.disabled { background: #f1f5f9; color: #94a3b8; border-color: var(--border); cursor: not-allowed; opacity: 0.7; }
         
-        .saturday-date-text { font-size: 0.88rem; font-weight: 800; color: var(--primary); }
-        .saturday-item-btn.active .saturday-date-text { color: var(--accent); }
+        .sunday-date-text { font-size: 0.88rem; font-weight: 800; color: var(--primary); }
+        .sunday-item-btn.active .sunday-date-text { color: var(--accent); }
         
-        .saturday-stat-badge { font-size: 0.75rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 3px 8px; border-radius: 5px; display: inline-block; width: fit-content; }
-        .saturday-item-btn.active .saturday-stat-badge { background: #dbeafe; color: #1e40af; }
+        .sunday-stat-badge { font-size: 0.75rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 3px 8px; border-radius: 5px; display: inline-block; width: fit-content; }
+        .sunday-item-btn.active .sunday-stat-badge { background: #dbeafe; color: #1e40af; }
 
         .member-card { display: flex; flex-direction: column; padding: 8px 10px; margin-bottom: 6px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .member-card.checked-10 { background-color: #ecfdf5 !important; border-color: #34d399 !important; border-left: 5px solid var(--success) !important; }
@@ -111,7 +111,7 @@
 
 <div class="container">
     <div class="main-title-box">
-        <div class="main-title">🏃‍♂️ 복사골마라톤클럽 출석부</div>
+        <div class="main-title">🏃‍♂️ 복사골마라톤 일요운동 출석부</div>
     </div>
     
     <div class="tab-group">
@@ -123,9 +123,9 @@
     <div id="tab-checkin">
         <div class="month-filter" id="checkin-month-buttons"></div>
         
-        <div class="saturday-list-box">
-            <div class="saturday-list-title" id="saturday-list-header">📅 2026년 11월 토달 출석현황</div>
-            <div class="saturday-vertical-group" id="saturday-vertical-wrapper"></div>
+        <div class="sunday-list-box">
+            <div class="sunday-list-title" id="sunday-list-header">📅 2026년 11월 일요운동 출석현황</div>
+            <div class="sunday-vertical-group" id="sunday-vertical-wrapper"></div>
         </div>
 
         <div id="member-list" class="loading">데이터 로딩 중...</div>
@@ -184,15 +184,15 @@
         { name: "이호병" }, { name: "방지원" }, { name: "황연성" }, { name: "노진규" }
     ];
 
-    let globalMembers = JSON.parse(localStorage.getItem('bks_members_v1')) || [...DEFAULT_MEMBERS];
+    let globalMembers = JSON.parse(localStorage.getItem('bks_sunday_members_v1')) || [...DEFAULT_MEMBERS];
     
-    let rawLogs = JSON.parse(localStorage.getItem('bks_logs_v1')) || [];
+    let rawLogs = JSON.parse(localStorage.getItem('bks_sunday_logs_v1')) || [];
     let globalLogs = rawLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
 
-    let adminPassword = localStorage.getItem('bks_admin_pwd') || "1234";
+    let adminPassword = localStorage.getItem('bks_sunday_admin_pwd') || "1234";
 
-    let selectedDateStr = localStorage.getItem('bks_selected_date') || "";
-    let checkinSelectedMonth = localStorage.getItem('bks_selected_month') || (String(new Date().getMonth() + 1) + "월");
+    let selectedDateStr = localStorage.getItem('bks_sunday_selected_date') || "";
+    let checkinSelectedMonth = localStorage.getItem('bks_sunday_selected_month') || (String(new Date().getMonth() + 1) + "월");
     let statsSelectedMonth = "전체";
 
     const currentYear = new Date().getFullYear();
@@ -206,18 +206,19 @@
         return `${years}년 ${months}월 ${days}일 ${weekDays[dateObj.getDay()]}`;
     }
 
-    function getAllSaturdaysOfCurrentYear() {
-        const saturdays = [];
+    // 올해의 모든 일요일 날짜 구하기 (getDay() === 0)
+    function getAllSundaysOfCurrentYear() {
+        const sundays = [];
         let d = new Date(currentYear, 0, 1);
-        while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
+        while (d.getDay() !== 0) d.setDate(d.getDate() + 1);
         while (d.getFullYear() === currentYear) {
-            saturdays.push(formatDateToString(new Date(d)));
+            sundays.push(formatDateToString(new Date(d)));
             d.setDate(d.getDate() + 7);
         }
-        return saturdays;
+        return sundays;
     }
 
-    const allSaturdays = getAllSaturdaysOfCurrentYear();
+    const allSundays = getAllSundaysOfCurrentYear();
 
     function initCheckinMonthButtons() {
         const wrapper = document.getElementById('checkin-month-buttons');
@@ -245,9 +246,9 @@
                     });
                     btn.classList.add('active');
                     checkinSelectedMonth = m;
-                    localStorage.setItem('bks_selected_month', m);
+                    localStorage.setItem('bks_sunday_selected_month', m);
                     
-                    const filtered = allSaturdays.filter(dStr => {
+                    const filtered = allSundays.filter(dStr => {
                         const mMatch = dStr.match(/(\d+)월/);
                         return mMatch && (mMatch[1] + "월") === m;
                     });
@@ -260,9 +261,9 @@
                             return tDate <= today;
                         });
                         selectedDateStr = validFiltered.length > 0 ? validFiltered[validFiltered.length - 1] : filtered[0];
-                        localStorage.setItem('bks_selected_date', selectedDateStr);
+                        localStorage.setItem('bks_sunday_selected_date', selectedDateStr);
                     }
-                    renderSaturdayVerticalList();
+                    renderSundayVerticalList();
                 };
             }
             wrapper.appendChild(btn);
@@ -286,34 +287,34 @@
         });
     }
 
-    function renderSaturdayVerticalList() {
-        const wrapper = document.getElementById('saturday-vertical-wrapper');
-        const header = document.getElementById('saturday-list-header');
+    function renderSundayVerticalList() {
+        const wrapper = document.getElementById('sunday-vertical-wrapper');
+        const header = document.getElementById('sunday-list-header');
         if (!wrapper) return;
         wrapper.innerHTML = '';
-        if (header) header.innerText = `📅 ${currentYear}년 ${checkinSelectedMonth} 토달 출석현황`;
+        if (header) header.innerText = `📅 ${currentYear}년 ${checkinSelectedMonth} 일요운동 출석현황`;
 
-        const filteredSaturdays = allSaturdays.filter(dStr => {
+        const filteredSundays = allSundays.filter(dStr => {
             const mMatch = dStr.match(/(\d+)월/);
             return mMatch && (mMatch[1] + "월") === checkinSelectedMonth;
         });
 
-        if (filteredSaturdays.length === 0) {
-            wrapper.innerHTML = "<div style='padding:10px; color:#888;'>해당 월에 토요일이 없습니다.</div>";
+        if (filteredSundays.length === 0) {
+            wrapper.innerHTML = "<div style='padding:10px; color:#888;'>해당 월에 일요일이 없습니다.</div>";
             return;
         }
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const validSaturdays = filteredSaturdays.filter(dStr => {
+        const validSundays = filteredSundays.filter(dStr => {
             const tDate = new Date(dStr.replace(/년|월/g, '-').replace(/일.*/, '').trim());
             tDate.setHours(0, 0, 0, 0);
             return tDate <= today;
         });
 
-        let defaultDate = validSaturdays.length > 0 ? validSaturdays[validSaturdays.length - 1] : filteredSaturdays[0];
-        if (!selectedDateStr || !filteredSaturdays.includes(selectedDateStr)) {
+        let defaultDate = validSundays.length > 0 ? validSundays[validSundays.length - 1] : filteredSundays[0];
+        if (!selectedDateStr || !filteredSundays.includes(selectedDateStr)) {
             selectedDateStr = defaultDate;
         }
 
@@ -332,7 +333,7 @@
             }
         });
 
-        filteredSaturdays.forEach(dStr => {
+        filteredSundays.forEach(dStr => {
             const btn = document.createElement('button');
             const cleanDateStr = dStr.replace(/년|월/g, '-').replace(/일.*/, '').trim();
             const targetDate = new Date(cleanDateStr);
@@ -345,19 +346,19 @@
             const displayDateText = dStr.replace(/^\d{4}년\s*/, '');
 
             if (isFuture) {
-                btn.className = 'saturday-item-btn disabled';
-                btn.innerHTML = `<span class="saturday-date-text">🔒 ${displayDateText} (예정)</span>`;
+                btn.className = 'sunday-item-btn disabled';
+                btn.innerHTML = `<span class="sunday-date-text">🔒 ${displayDateText} (예정)</span>`;
                 btn.onclick = () => alert("아직 다가오지 않은 미래 날짜는 체크할 수 없습니다!");
             } else {
-                btn.className = `saturday-item-btn ${isSelected ? 'active' : ''}`;
+                btn.className = `sunday-item-btn ${isSelected ? 'active' : ''}`;
                 btn.innerHTML = `
-                    <span class="saturday-date-text">${displayDateText}</span>
-                    <span class="saturday-stat-badge">총 ${dateStat.total}명 (참석(운동): ${dateStat.workout}, 참석: ${dateStat.attend}, 대회: ${dateStat.comp})</span>
+                    <span class="sunday-date-text">${displayDateText}</span>
+                    <span class="sunday-stat-badge">총 ${dateStat.total}명 (참석(운동): ${dateStat.workout}, 참석: ${dateStat.attend}, 대회: ${dateStat.comp})</span>
                 `;
                 btn.onclick = () => {
                     selectedDateStr = dStr;
-                    localStorage.setItem('bks_selected_date', dStr);
-                    renderSaturdayVerticalList();
+                    localStorage.setItem('bks_sunday_selected_date', dStr);
+                    renderSundayVerticalList();
                 };
             }
             wrapper.appendChild(btn);
@@ -372,7 +373,7 @@
             document.getElementById('tab-stats').classList.add('hidden');
             document.getElementById('tab-checkin-btn').classList.add('active');
             document.getElementById('tab-stats-btn').classList.remove('active');
-            renderSaturdayVerticalList();
+            renderSundayVerticalList();
         } else {
             document.getElementById('tab-checkin').classList.add('hidden');
             document.getElementById('tab-stats').classList.remove('hidden');
@@ -392,8 +393,8 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('bks_members_v1', JSON.stringify(globalMembers));
-        localStorage.setItem('bks_logs_v1', JSON.stringify(globalLogs));
+        localStorage.setItem('bks_sunday_members_v1', JSON.stringify(globalMembers));
+        localStorage.setItem('bks_sunday_logs_v1', JSON.stringify(globalLogs));
     }
 
     async function loadDataFromSheet() {
@@ -478,7 +479,7 @@
         }
         if (confirm("관리자 비밀번호를 정말 변경하시겠습니까?")) {
             adminPassword = newPwd;
-            localStorage.setItem('bks_admin_pwd', newPwd);
+            localStorage.setItem('bks_sunday_admin_pwd', newPwd);
             input.value = '';
             alert("관리자 비밀번호가 성공적으로 변경되었습니다.");
         }
@@ -507,7 +508,7 @@
         globalMembers.push({ name: name });
         sortMembers();
         renderAdminMemberList();
-        renderSaturdayVerticalList();
+        renderSundayVerticalList();
         renderStats();
         await saveDataToSheet();
         input.value = '';
@@ -521,7 +522,7 @@
         globalMembers.splice(index, 1);
         sortMembers();
         renderAdminMemberList();
-        renderSaturdayVerticalList();
+        renderSundayVerticalList();
         renderStats();
         await saveDataToSheet();
         alert(`[${targetName}] 회원이 삭제되었습니다.`);
@@ -681,7 +682,7 @@
             });
         }
 
-        renderSaturdayVerticalList();
+        renderSundayVerticalList();
         renderStats();
         await saveDataToSheet();
     }
@@ -787,12 +788,12 @@
     async function initApp() {
         initCheckinMonthButtons();
         initStatsMonthButtons();
-        sortmgr = sortMembers();
-        renderSaturdayVerticalList();
+        sortMembers();
+        renderSundayVerticalList();
         renderStats();
         
         await loadDataFromSheet();
-        renderSaturdayVerticalList();
+        renderSundayVerticalList();
         renderStats();
     }
 
