@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>복사골마라톤 일요운동 출석부</title>
+    <title>복사골마라톤클럽 일요운동 출석부</title>
     
     <!-- 카카오톡 및 웹 썸네일/아이콘 설정 -->
-    <link rel="apple-touch-icon" href="total_sunday_og.png">
-    <link rel="icon" sizes="192x192" href="total_sunday_og.png">
-    <link rel="icon" href="total_sunday_og.png" type="image/png">
-    <meta property="og:image" content="https://morningrun.github.io/boksakol/total_sunday_og.png?v=3">
+    <link rel="apple-touch-icon" href="todal_attendance_og.jpg">
+    <link rel="icon" sizes="192x192" href="todal_attendance_og.jpg">
+    <link rel="icon" href="todal_attendance_og.jpg" type="image/jpeg">
 
-    <!-- ☀️ 카카오톡 공유 시 미리보기 이미지 및 제목/설정 태그 -->
+    <!-- 🌟 카카오톡 공유 시 미리보기 이미지 및 제목/설정 태그 -->
     <meta property="property" content="website">
-    <meta property="og:title" content="복사골마라톤 일요운동 출석부">
+    <meta property="og:title" content="복사골마라톤클럽 일요운동 출석부">
     <meta property="og:description" content="일요일 달리기 모임 출석 및 누적현황 관리 시스템">
-    <meta property="og:image" content="https://morningrun.github.io/boksakol/total_sunday_og.png?v=3">
+    <meta property="og:image" content="https://morningrun.github.io/boksakol/todal_attendance_og.jpg">
     <meta property="og:url" content="https://morningrun.github.io/boksakol/">
-    
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="복사골일요출석부">
+    <meta name="apple-mobile-web-app-title" content="일요운동출석부">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f172a">
 
@@ -41,25 +40,29 @@
 
         html { width: 100%; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 8px; color: var(--text-main); -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        
         .container { max-width: 600px; width: 100%; box-sizing: border-box; margin: 0 auto; background: var(--card-bg); padding: 12px; border-radius: 14px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08); }
         
         .main-title-box { text-align: center; margin: 8px 0 12px 0; }
-        .main-title { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+        .main-title { font-size: 1.6rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
         
         .tab-group { display: flex; gap: 6px; margin-bottom: 12px; background: #cbd5e1; padding: 3px; border-radius: 10px; position: sticky; top: 6px; z-index: 10; backdrop-filter: blur(8px); }
         .tab-btn { flex: 1; padding: 9px 4px; font-size: 0.9rem; border: none; background: transparent; color: var(--text-sub); font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-align: center; }
         .tab-btn.active { background: var(--card-bg); color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-        /* 💡 좌우 스와이프 영역 (여백 문제 해결 및 동적 높이 구조) */
         .swipe-wrapper { width: 100%; position: relative; overflow: hidden; min-height: 400px; box-sizing: border-box; transition: height 0.2s ease; }
         .swipe-container { display: flex; width: 200%; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform; align-items: flex-start; box-sizing: border-box; }
         
         .swipe-pane { width: 50%; flex-shrink: 0; box-sizing: border-box; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; visibility: hidden; padding: 0 2px; }
         .swipe-pane.active-pane { opacity: 1; pointer-events: auto; visibility: visible; height: auto; }
 
-        .month-filter { display: flex; flex-wrap: wrap; gap: 5px; padding-bottom: 4px; margin-bottom: 12px; justify-content: center; }
-        .month-btn { padding: 7px 10px; font-size: 0.8rem; border: 1px solid var(--border); border-radius: 7px; background: #ffffff; cursor: pointer; font-weight: 700; color: var(--text-sub); }
+        /* 🌟 월별 버튼 컴팩트화 (12월이 아래로 내려가지 않도록 촘촘하게 배치) */
+        .month-filter { display: flex; flex-wrap: wrap; gap: 3.5px; padding-bottom: 2px; margin-bottom: 2px; justify-content: center; }
+        .month-btn { padding: 6px 7.5px; font-size: 0.78rem; border: 1px solid var(--border); border-radius: 7px; background: #ffffff; cursor: pointer; font-weight: 700; color: var(--text-sub); }
         .month-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 6px rgba(37,99,235,0.25); }
+
+        /* 🌟 누적현황 기준일자 텍스트 간격 조정 */
+        .stats-current-date-box { text-align: center; font-size: 0.92rem; font-weight: 800; color: var(--accent); margin-top: 10px; margin-bottom: 10px; letter-spacing: -0.3px; }
 
         .sunday-list-box { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
         .sunday-list-title { font-size: 0.88rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
@@ -108,7 +111,6 @@
         .admin-member-row { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 8px 12px; border-radius: 7px; margin-bottom: 6px; font-size: 0.88rem; border: 1px solid #334155; }
         .admin-member-row button { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 0.78rem; font-weight: 700; }
         
-        /* ⚙️ 우측 하단 구석 톱니바퀴 기호 버튼 */
         .footer-setting-box { display: flex; justify-content: flex-end; margin-top: 15px; padding-top: 10px; border-top: 1.5px solid var(--border); }
         .admin-gear-icon-btn { background: #f8fafc; border: 1.5px solid var(--border); font-size: 1.1rem; cursor: pointer; padding: 6px 10px; color: var(--text-sub); border-radius: 8px; font-weight: 800; }
         .admin-gear-icon-btn:hover { background: #f1f5f9; color: var(--accent); border-color: var(--accent); }
@@ -121,7 +123,7 @@
 
 <div class="container">
     <div class="main-title-box">
-        <div class="main-title">🏃‍♂️ 복사골마라톤 일요운동 출석부</div>
+        <div class="main-title">🏃‍♂️ 복사골 일요운동 출석부</div>
     </div>
     
     <div class="tab-group">
@@ -129,7 +131,7 @@
         <button class="tab-btn" id="tab-stats-btn">🏆 <span id="current-year-text">2026</span>년 누적현황</button>
     </div>
 
-    <!-- 💡 좌우 스와이프 영역 (스크롤 적용 및 높이 밀착 구조) -->
+    <!-- 좌우 스와이프 영역 -->
     <div class="swipe-wrapper" id="swipe-wrapper">
         <div id="swipe-container" class="swipe-container">
             <!-- 1번 패널: 출석체크 -->
@@ -147,12 +149,14 @@
             <!-- 2번 패널: 누적현황 -->
             <div class="swipe-pane" id="pane-stats">
                 <div class="month-filter" id="stats-month-buttons"></div>
+                <!-- 🌟 누적현황 월별 버튼 밑에 고정되는 기준일자 텍스트 영역 -->
+                <div class="stats-current-date-box" id="stats-current-date-text">[ 2026년 11월 14일 현재 ]</div>
                 <div id="stats-list" class="loading">누적 데이터 계산 중...</div>
             </div>
         </div>
     </div>
 
-    <!-- 관리자 회원 관리 패널 (콘텐츠 바로 밑에 위치) -->
+    <!-- 관리자 회원 관리 패널 -->
     <div id="admin-panel" class="admin-panel hidden">
         <h3>🔒 관리자 설정 및 회원 관리</h3>
         
@@ -171,44 +175,35 @@
         <button onclick="toggleAdminMode()" style="width:100%; margin-top:12px; background:#475569; color:white; border:none; padding:9px; border-radius:7px; cursor:pointer; font-weight:800;">설정 닫기</button>
     </div>
 
-    <!-- ⚙️ 우측 하단 구석 톱니바퀴 기호 버튼 -->
+    <!-- 우측 하단 구석 톱니바퀴 기호 버튼 -->
     <div class="footer-setting-box">
         <button class="admin-gear-icon-btn" id="admin-open-btn" title="관리자 설정">⚙️</button>
     </div>
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzK8T13CKy80UyQbhH7sptZNb4qDfp_I2KsxJQlujg4HEmHH-Zw9r9huVQSvvgU2IO9/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPXWM6bKfUYZgRL5hC947VmRQgtB8RBrylaTtOO0Yb2zBVuRwIBUQtcqgNgiU9FEfuaA/exec";
 
     const DEFAULT_MEMBERS = [
-        { name: "김창선" }, { name: "방철규" }, { name: "정도영" }, { name: "정범희" }, { name: "조한복" },
-        { name: "지덕수" }, { name: "필동만" }, { name: "이석형" }, { name: "김종수" }, { name: "이재학" },
-        { name: "심재현" }, { name: "이현석" }, { name: "장경문" }, { name: "최병일" }, { name: "김봉근" },
-        { name: "김윤찬" }, { name: "황문섭" }, { name: "이달재" }, { name: "윤영종" }, { name: "이실권" },
-        { name: "권용문" }, { name: "정세원" }, { name: "윤명기" }, { name: "서문오룡" }, { name: "이원우" },
-        { name: "김기중" }, { name: "정일흥" }, { name: "최기석" }, { name: "김영학" }, { name: "이구철" },
-        { name: "김귀동" }, { name: "김정균" }, { name: "이세형" }, { name: "송영숙" }, { name: "박광남" },
-        { name: "이도희" }, { name: "이청규" }, { name: "송재동" }, { name: "이강훈" }, { name: "은대영" },
-        { name: "조성국" }, { name: "김덕원" }, { name: "최정엽" }, { name: "정하근" }, { name: "김태수" },
-        { name: "김경기" }, { name: "임윤석" }, { name: "남중원" }, { name: "이재응" }, { name: "조재광" },
-        { name: "김형섭" }, { name: "변흥주" }, { name: "최순규" }, { name: "박정호" }, { name: "이주영" },
-        { name: "박정후" }, { name: "이해식" }, { name: "진용남" }, { name: "임장수" }, { name: "이동섭" },
-        { name: "김미향" }, { name: "김정구" }, { name: "박한라" }, { name: "이현조" }, { name: "정현주" },
-        { name: "최규식" }, { name: "김진철" }, { name: "이은순" }, { name: "노현종" }, { name: "곽병우" },
-        { name: "김장곤" }, { name: "이동기" }, { name: "민병일" }, { name: "이학조" }, { name: "박지혜" },
-        { name: "최잔디" }, { name: "이정숙" }, { name: "김은성" }, { name: "이종호" }, { name: "정호진" },
-        { name: "이호병" }, { name: "방지원" }, { name: "황연성" }, { name: "노진규" }
+        { name: "곽병우" }, { name: "김경기" }, { name: "김미향" }, { name: "김은성" }, 
+        { name: "김정구" }, { name: "김정균" }, { name: "김진철" }, { name: "김태수" }, 
+        { name: "노현종" }, { name: "박광남" }, { name: "박정후" }, { name: "박지혜" }, 
+        { name: "송영숙" }, { name: "은대영" }, { name: "이동기" }, { name: "이세형" }, 
+        { name: "이실권" }, { name: "이은순" }, { name: "이재응" }, { name: "이정숙" }, 
+        { name: "이종호" }, { name: "이학조" }, { name: "이해식" }, { name: "이호병" }, 
+        { name: "정세원" }, { name: "정하근" }, { name: "정현주" }, { name: "정호진" }, 
+        { name: "조성국" }, { name: "최순규" }, { name: "최잔디" }, { name: "황연성" }
     ];
 
-    let globalMembers = JSON.parse(localStorage.getItem('bks_sunday_members_v1')) || [...DEFAULT_MEMBERS];
+    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v1')) || [...DEFAULT_MEMBERS];
     
-    let rawLogs = JSON.parse(localStorage.getItem('bks_sunday_logs_v1')) || [];
+    let rawLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v1')) || [];
     let globalLogs = rawLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
 
-    let adminPassword = localStorage.getItem('bks_sunday_admin_pwd') || "1234";
+    let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
 
-    let selectedDateStr = localStorage.getItem('bks_sunday_selected_date') || "";
-    let checkinSelectedMonth = localStorage.getItem('bks_sunday_selected_month') || (String(new Date().getMonth() + 1) + "월");
+    let selectedDateStr = localStorage.getItem('boksakol_sunday_selected_date') || "";
+    let checkinSelectedMonth = localStorage.getItem('boksakol_sunday_selected_month') || (String(new Date().getMonth() + 1) + "월");
     let statsSelectedMonth = "전체";
     let activePaneIndex = 0;
 
@@ -243,6 +238,7 @@
         return `${years}년 ${months}월 ${days}일 ${weekDays[dateObj.getDay()]}`;
     }
 
+    /* 🌟 일요일 날짜들만 가져오도록 수정 (getDay() === 0) */
     function getAllSundaysOfCurrentYear() {
         const sundays = [];
         let d = new Date(currentYear, 0, 1);
@@ -282,7 +278,7 @@
                     });
                     btn.classList.add('active');
                     checkinSelectedMonth = m;
-                    localStorage.setItem('bks_sunday_selected_month', m);
+                    localStorage.setItem('boksakol_sunday_selected_month', m);
                     
                     const filtered = allSundays.filter(dStr => {
                         const mMatch = dStr.match(/(\d+)월/);
@@ -297,7 +293,7 @@
                             return tDate <= today;
                         });
                         selectedDateStr = validFiltered.length > 0 ? validFiltered[validFiltered.length - 1] : filtered[0];
-                        localStorage.setItem('bks_sunday_selected_date', selectedDateStr);
+                        localStorage.setItem('boksakol_sunday_selected_date', selectedDateStr);
                     }
                     renderSundayVerticalList();
                 };
@@ -394,7 +390,7 @@
                 `;
                 btn.onclick = () => {
                     selectedDateStr = dStr;
-                    localStorage.setItem('bks_sunday_selected_date', dStr);
+                    localStorage.setItem('boksakol_sunday_selected_date', dStr);
                     renderSundayVerticalList();
                 };
             }
@@ -439,8 +435,8 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('bks_sunday_members_v1', JSON.stringify(globalMembers));
-        localStorage.setItem('bks_sunday_logs_v1', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_members_v1', JSON.stringify(globalMembers));
+        localStorage.setItem('boksakol_sunday_logs_v1', JSON.stringify(globalLogs));
     }
 
     async function loadDataFromSheet() {
@@ -526,7 +522,7 @@
         }
         if (confirm("관리자 비밀번호를 정말 변경하시겠습니까?")) {
             adminPassword = newPwd;
-            localStorage.setItem('bks_sunday_admin_pwd', newPwd);
+            localStorage.setItem('boksakol_sunday_admin_pwd', newPwd);
             input.value = '';
             alert("관리자 비밀번호가 성공적으로 변경되었습니다.");
         }
@@ -737,6 +733,25 @@
 
     function renderStats() {
         const statsDiv = document.getElementById('stats-list');
+        const dateTextDiv = document.getElementById('stats-current-date-text');
+        
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = now.getMonth() + 1;
+        const d = now.getDate();
+        
+        if (statsSelectedMonth === "전체") {
+            dateTextDiv.innerText = `[ ${y}년 ${m}월 ${d}일 현재 ]`;
+        } else {
+            const mNum = parseInt(statsSelectedMonth.replace(/[^0-9]/g, ""), 10);
+            if (mNum === m) {
+                dateTextDiv.innerText = `[ ${y}년 ${m}월 ${d}일 현재 ]`;
+            } else {
+                const lastDay = new Date(y, mNum, 0).getDate();
+                dateTextDiv.innerText = `[ ${y}년 ${mNum}월 ${lastDay}일 기준 ]`;
+            }
+        }
+
         if (!statsDiv) return;
         statsDiv.innerHTML = '';
 
@@ -757,10 +772,10 @@
         uniqueLogs.forEach(log => {
             const name = String(log.name).trim();
             const score = Number(log.score);
-            let m = Number(log.month) || 0;
-            if (!m) {
+            let mVal = Number(log.month) || 0;
+            if (!mVal) {
                 const mMatch = String(log.date).match(/(\d+)월/);
-                if (mMatch) m = parseInt(mMatch[1], 10);
+                if (mMatch) mVal = parseInt(mMatch[1], 10);
             }
 
             if (!statsMap[name]) {
@@ -774,14 +789,14 @@
 
             statsMap[name].score += points;
 
-            if (m >= 1 && m <= 12) {
-                if (!statsMap[name].monthly[m]) {
-                    statsMap[name].monthly[m] = { score: 0, workout: 0, attend: 0, comp: 0 };
+            if (mVal >= 1 && mVal <= 12) {
+                if (!statsMap[name].monthly[mVal]) {
+                    statsMap[name].monthly[mVal] = { score: 0, workout: 0, attend: 0, comp: 0 };
                 }
-                statsMap[name].monthly[m].score += points;
-                if (score === 10) statsMap[name].monthly[m].workout += 1;
-                else if (score === 5) statsMap[name].monthly[m].attend += 1;
-                else if (score === 99) statsMap[name].monthly[m].comp += 1;
+                statsMap[name].monthly[mVal].score += points;
+                if (score === 10) statsMap[name].monthly[mVal].workout += 1;
+                else if (score === 5) statsMap[name].monthly[mVal].attend += 1;
+                else if (score === 99) statsMap[name].monthly[mVal].comp += 1;
             }
         });
 
@@ -844,7 +859,6 @@
             updateSwipeWrapperHeight();
         });
 
-        // 💡 좌우 스와이프 제스처 핸들링
         const swipeContainer = document.getElementById('swipe-container');
         let startX = 0;
         let startY = 0;
@@ -897,7 +911,11 @@
         renderStats();
     }
 
-    initApp();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+        initApp();
+    }
 </script>
 
 </body>
