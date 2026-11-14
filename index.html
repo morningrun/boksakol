@@ -7,9 +7,9 @@
     
     <!-- 카카오톡 및 웹 썸네일/아이콘 설정 -->
     <link rel="apple-touch-icon" href="total_sunday_og.png">
-<link rel="icon" sizes="192x192" href="total_sunday_og.png">
-<link rel="icon" href="total_sunday_og.png" type="image/png">
-<meta property="og:image" content="https://morningrun.github.io/boksakol/total_sunday_og.png?v=3">
+    <link rel="icon" sizes="192x192" href="total_sunday_og.png">
+    <link rel="icon" href="total_sunday_og.png" type="image/png">
+    <meta property="og:image" content="https://morningrun.github.io/boksakol/total_sunday_og.png?v=3">
 
     <!-- ☀️ 카카오톡 공유 시 미리보기 이미지 및 제목/설정 태그 -->
     <meta property="property" content="website">
@@ -39,8 +39,9 @@
             --border: #cbd5e1;
         }
 
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 8px; color: var(--text-main); -webkit-tap-highlight-color: transparent; }
-        .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 12px; border-radius: 14px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08); }
+        html { width: 100%; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 8px; color: var(--text-main); -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        .container { max-width: 600px; width: 100%; box-sizing: border-box; margin: 0 auto; background: var(--card-bg); padding: 12px; border-radius: 14px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08); }
         
         .main-title-box { text-align: center; margin: 8px 0 12px 0; }
         .main-title { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
@@ -48,6 +49,13 @@
         .tab-group { display: flex; gap: 6px; margin-bottom: 12px; background: #cbd5e1; padding: 3px; border-radius: 10px; position: sticky; top: 6px; z-index: 10; backdrop-filter: blur(8px); }
         .tab-btn { flex: 1; padding: 9px 4px; font-size: 0.9rem; border: none; background: transparent; color: var(--text-sub); font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-align: center; }
         .tab-btn.active { background: var(--card-bg); color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+        /* 💡 좌우 스와이프 영역 (여백 문제 해결 및 동적 높이 구조) */
+        .swipe-wrapper { width: 100%; position: relative; overflow: hidden; min-height: 400px; box-sizing: border-box; transition: height 0.2s ease; }
+        .swipe-container { display: flex; width: 200%; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform; align-items: flex-start; box-sizing: border-box; }
+        
+        .swipe-pane { width: 50%; flex-shrink: 0; box-sizing: border-box; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; visibility: hidden; padding: 0 2px; }
+        .swipe-pane.active-pane { opacity: 1; pointer-events: auto; visibility: visible; height: auto; }
 
         .month-filter { display: flex; flex-wrap: wrap; gap: 5px; padding-bottom: 4px; margin-bottom: 12px; justify-content: center; }
         .month-btn { padding: 7px 10px; font-size: 0.8rem; border: 1px solid var(--border); border-radius: 7px; background: #ffffff; cursor: pointer; font-weight: 700; color: var(--text-sub); }
@@ -57,7 +65,6 @@
         .sunday-list-title { font-size: 0.88rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
         .sunday-vertical-group { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
         
-        /* 모바일 최적화된 일요일 날짜 선택 버튼 */
         .sunday-item-btn { padding: 10px 12px; background: #ffffff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 4px; transition: all 0.2s; }
         .sunday-item-btn.active { background: #eff6ff; color: var(--accent); border: 2px solid var(--accent); }
         .sunday-item-btn.disabled { background: #f1f5f9; color: #94a3b8; border-color: var(--border); cursor: not-allowed; opacity: 0.7; }
@@ -92,7 +99,7 @@
         .rank-detail { font-size: 0.62rem; color: var(--text-sub); font-weight: 700; text-align: center; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .rank-score { font-weight: 800; width: 44px; font-size: 0.95rem; color: var(--success); text-align: right; white-space: nowrap; flex-shrink: 0; }
 
-        .admin-panel { background: var(--primary); color: white; padding: 14px; border-radius: 12px; margin-top: 20px; margin-bottom: 12px; }
+        .admin-panel { background: var(--primary); color: white; padding: 14px; border-radius: 12px; margin-top: 15px; margin-bottom: 12px; }
         .admin-panel h3 { margin: 0 0 10px 0; font-size: 1rem; color: #38bdf8; }
         .admin-input-group { display: flex; gap: 6px; margin-bottom: 10px; }
         .admin-input-group input { flex: 1; padding: 9px 12px; border-radius: 7px; border: none; font-size: 0.9rem; outline: none; }
@@ -101,10 +108,12 @@
         .admin-member-row { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 8px 12px; border-radius: 7px; margin-bottom: 6px; font-size: 0.88rem; border: 1px solid #334155; }
         .admin-member-row button { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 0.78rem; font-weight: 700; }
         
-        .footer-setting-box { text-align: center; margin-top: 24px; padding-top: 14px; border-top: 1.5px solid var(--border); }
-        .admin-gear-btn-small { background: #f8fafc; border: 1.5px solid var(--border); font-size: 0.8rem; cursor: pointer; padding: 6px 14px; color: var(--text-sub); border-radius: 7px; font-weight: 800; }
+        /* ⚙️ 우측 하단 구석 톱니바퀴 기호 버튼 */
+        .footer-setting-box { display: flex; justify-content: flex-end; margin-top: 15px; padding-top: 10px; border-top: 1.5px solid var(--border); }
+        .admin-gear-icon-btn { background: #f8fafc; border: 1.5px solid var(--border); font-size: 1.1rem; cursor: pointer; padding: 6px 10px; color: var(--text-sub); border-radius: 8px; font-weight: 800; }
+        .admin-gear-icon-btn:hover { background: #f1f5f9; color: var(--accent); border-color: var(--accent); }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .loading { text-align: center; color: var(--text-sub); padding: 25px; font-weight: 700; }
     </style>
 </head>
@@ -116,29 +125,34 @@
     </div>
     
     <div class="tab-group">
-        <button class="tab-btn active" id="tab-checkin-btn" onclick="switchTab('checkin')">📅 출석체크</button>
-        <button class="tab-btn" id="tab-stats-btn" onclick="switchTab('stats')">🏆 <span id="current-year-text">2026</span>년 누적현황</button>
+        <button class="tab-btn active" id="tab-checkin-btn">📅 출석체크</button>
+        <button class="tab-btn" id="tab-stats-btn">🏆 <span id="current-year-text">2026</span>년 누적현황</button>
     </div>
 
-    <!-- 출석체크 탭 -->
-    <div id="tab-checkin">
-        <div class="month-filter" id="checkin-month-buttons"></div>
-        
-        <div class="sunday-list-box">
-            <div class="sunday-list-title" id="sunday-list-header">📅 2026년 11월 일요운동 출석현황</div>
-            <div class="sunday-vertical-group" id="sunday-vertical-wrapper"></div>
+    <!-- 💡 좌우 스와이프 영역 (스크롤 적용 및 높이 밀착 구조) -->
+    <div class="swipe-wrapper" id="swipe-wrapper">
+        <div id="swipe-container" class="swipe-container">
+            <!-- 1번 패널: 출석체크 -->
+            <div class="swipe-pane active-pane" id="pane-checkin">
+                <div class="month-filter" id="checkin-month-buttons"></div>
+                
+                <div class="sunday-list-box">
+                    <div class="sunday-list-title" id="sunday-list-header">📅 2026년 11월 일요운동 출석현황</div>
+                    <div class="sunday-vertical-group" id="sunday-vertical-wrapper"></div>
+                </div>
+
+                <div id="member-list" class="loading">데이터 로딩 중...</div>
+            </div>
+
+            <!-- 2번 패널: 누적현황 -->
+            <div class="swipe-pane" id="pane-stats">
+                <div class="month-filter" id="stats-month-buttons"></div>
+                <div id="stats-list" class="loading">누적 데이터 계산 중...</div>
+            </div>
         </div>
-
-        <div id="member-list" class="loading">데이터 로딩 중...</div>
     </div>
 
-    <!-- 누적현황 탭 -->
-    <div id="tab-stats" class="hidden">
-        <div class="month-filter" id="stats-month-buttons"></div>
-        <div id="stats-list" class="loading">누적 데이터 계산 중...</div>
-    </div>
-
-    <!-- 관리자 회원 관리 패널 -->
+    <!-- 관리자 회원 관리 패널 (콘텐츠 바로 밑에 위치) -->
     <div id="admin-panel" class="admin-panel hidden">
         <h3>🔒 관리자 설정 및 회원 관리</h3>
         
@@ -157,8 +171,9 @@
         <button onclick="toggleAdminMode()" style="width:100%; margin-top:12px; background:#475569; color:white; border:none; padding:9px; border-radius:7px; cursor:pointer; font-weight:800;">설정 닫기</button>
     </div>
 
+    <!-- ⚙️ 우측 하단 구석 톱니바퀴 기호 버튼 -->
     <div class="footer-setting-box">
-        <button class="admin-gear-btn-small" onclick="toggleAdminMode()">⚙️ 관리자 설정</button>
+        <button class="admin-gear-icon-btn" id="admin-open-btn" title="관리자 설정">⚙️</button>
     </div>
 </div>
 
@@ -195,9 +210,30 @@
     let selectedDateStr = localStorage.getItem('bks_sunday_selected_date') || "";
     let checkinSelectedMonth = localStorage.getItem('bks_sunday_selected_month') || (String(new Date().getMonth() + 1) + "월");
     let statsSelectedMonth = "전체";
+    let activePaneIndex = 0;
 
     const currentYear = new Date().getFullYear();
     document.getElementById('current-year-text').innerText = currentYear;
+
+    function updateSwipeWrapperHeight() {
+        const calculate = () => {
+            const wrapper = document.getElementById('swipe-wrapper');
+            const panes = [
+                document.getElementById('pane-checkin'),
+                document.getElementById('pane-stats')
+            ];
+            if (wrapper && panes[activePaneIndex]) {
+                const targetPane = panes[activePaneIndex];
+                const targetHeight = targetPane.scrollHeight;
+                if (targetHeight > 0) {
+                    wrapper.style.height = (targetHeight + 20) + 'px';
+                }
+            }
+        };
+        requestAnimationFrame(calculate);
+        setTimeout(calculate, 50);
+        setTimeout(calculate, 200);
+    }
 
     function formatDateToString(dateObj) {
         const years = dateObj.getFullYear();
@@ -207,7 +243,6 @@
         return `${years}년 ${months}월 ${days}일 ${weekDays[dateObj.getDay()]}`;
     }
 
-    // 올해의 모든 일요일 날짜 구하기 (getDay() === 0)
     function getAllSundaysOfCurrentYear() {
         const sundays = [];
         let d = new Date(currentYear, 0, 1);
@@ -302,6 +337,7 @@
 
         if (filteredSundays.length === 0) {
             wrapper.innerHTML = "<div style='padding:10px; color:#888;'>해당 월에 일요일이 없습니다.</div>";
+            updateSwipeWrapperHeight();
             return;
         }
 
@@ -368,20 +404,29 @@
         renderCheckinList();
     }
 
-    function switchTab(tabName) {
-        if (tabName === 'checkin') {
-            document.getElementById('tab-checkin').classList.remove('hidden');
-            document.getElementById('tab-stats').classList.add('hidden');
-            document.getElementById('tab-checkin-btn').classList.add('active');
-            document.getElementById('tab-stats-btn').classList.remove('active');
+    function switchTab(index) {
+        activePaneIndex = index;
+        const container = document.getElementById('swipe-container');
+        const checkinBtn = document.getElementById('tab-checkin-btn');
+        const statsBtn = document.getElementById('tab-stats-btn');
+
+        checkinBtn.classList.remove('active');
+        statsBtn.classList.remove('active');
+        document.getElementById('pane-checkin').classList.remove('active-pane');
+        document.getElementById('pane-stats').classList.remove('active-pane');
+
+        if (index === 0) {
+            container.style.transform = 'translateX(0%)';
+            checkinBtn.classList.add('active');
+            document.getElementById('pane-checkin').classList.add('active-pane');
             renderSundayVerticalList();
         } else {
-            document.getElementById('tab-checkin').classList.add('hidden');
-            document.getElementById('tab-stats').classList.remove('hidden');
-            document.getElementById('tab-checkin-btn').classList.remove('active');
-            document.getElementById('tab-stats-btn').classList.add('active');
-            renderStats(); 
+            container.style.transform = 'translateX(-50%)';
+            statsBtn.classList.add('active');
+            document.getElementById('pane-stats').classList.add('active-pane');
+            renderStats();
         }
+        updateSwipeWrapperHeight();
     }
 
     function sortMembers() {
@@ -469,6 +514,7 @@
         } else {
             panel.classList.add('hidden');
         }
+        updateSwipeWrapperHeight();
     }
 
     function changePassword() {
@@ -498,6 +544,7 @@
             `;
             listDiv.appendChild(row);
         });
+        updateSwipeWrapperHeight();
     }
 
     async function addMember() {
@@ -546,7 +593,6 @@
             }
         });
 
-        // 정렬 순서: 참석(운동)(10) -> 참석(5) -> 대회(99) -> 미체크(0)
         const getGroupOrder = (score) => {
             if (score === 10) return 1;
             if (score === 5) return 2;
@@ -651,6 +697,7 @@
             card.appendChild(buttonGroup);
             listDiv.appendChild(card);
         });
+        updateSwipeWrapperHeight();
     }
 
     async function handleCheckIn(name, score) {
@@ -765,6 +812,7 @@
 
         if (displayList.length === 0) {
             statsDiv.innerHTML = "<div style='text-align:center; padding:35px; color:#94a3b8; font-weight:700;'>해당 기간에 기록이 있는 회원이 없습니다.</div>";
+            updateSwipeWrapperHeight();
             return;
         }
 
@@ -784,9 +832,60 @@
             `;
             statsDiv.appendChild(card);
         });
+        updateSwipeWrapperHeight();
+    }
+
+    function initEventBindings() {
+        document.getElementById('tab-checkin-btn').onclick = () => switchTab(0);
+        document.getElementById('tab-stats-btn').onclick = () => switchTab(1);
+        document.getElementById('admin-open-btn').onclick = toggleAdminMode;
+
+        window.addEventListener('resize', () => {
+            updateSwipeWrapperHeight();
+        });
+
+        // 💡 좌우 스와이프 제스처 핸들링
+        const swipeContainer = document.getElementById('swipe-container');
+        let startX = 0;
+        let startY = 0;
+        let isSwiping = false;
+
+        swipeContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isSwiping = true;
+        }, { passive: true });
+
+        swipeContainer.addEventListener('touchmove', (e) => {
+            if (!isSwiping) return;
+            let currentX = e.touches[0].clientX;
+            let currentY = e.touches[0].clientY;
+            let diffX = Math.abs(currentX - startX);
+            let diffY = Math.abs(currentY - startY);
+            if (diffX > diffY) {
+                // 가로 스와이프 시 기본 스크롤 간섭 방지
+            }
+        }, { passive: true });
+
+        swipeContainer.addEventListener('touchend', (e) => {
+            if (!isSwiping) return;
+            isSwiping = false;
+
+            let endX = e.changedTouches[0].clientX;
+            let diff = startX - endX;
+
+            if (Math.abs(diff) > 40) {
+                if (diff > 0 && activePaneIndex < 1) {
+                    switchTab(activePaneIndex + 1);
+                } else if (diff < 0 && activePaneIndex > 0) {
+                    switchTab(activePaneIndex - 1);
+                }
+            }
+        });
     }
 
     async function initApp() {
+        initEventBindings();
         initCheckinMonthButtons();
         initStatsMonthButtons();
         sortMembers();
