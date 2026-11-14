@@ -56,12 +56,12 @@
         .swipe-pane { width: 50%; flex-shrink: 0; box-sizing: border-box; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; visibility: hidden; padding: 0 2px; }
         .swipe-pane.active-pane { opacity: 1; pointer-events: auto; visibility: visible; height: auto; }
 
-        /* 🌟 월별 버튼 컴팩트화 (12월이 아래로 내려가지 않도록 촘촘하게 배치) */
+        /* 월별 버튼 컴팩트화 */
         .month-filter { display: flex; flex-wrap: wrap; gap: 3.5px; padding-bottom: 2px; margin-bottom: 2px; justify-content: center; }
         .month-btn { padding: 6px 7.5px; font-size: 0.78rem; border: 1px solid var(--border); border-radius: 7px; background: #ffffff; cursor: pointer; font-weight: 700; color: var(--text-sub); }
         .month-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 6px rgba(37,99,235,0.25); }
 
-        /* 🌟 누적현황 기준일자 텍스트 간격 조정 */
+        /* 누적현황 기준일자 텍스트 간격 조정 */
         .stats-current-date-box { text-align: center; font-size: 0.92rem; font-weight: 800; color: var(--accent); margin-top: 10px; margin-bottom: 10px; letter-spacing: -0.3px; }
 
         .sunday-list-box { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
@@ -149,8 +149,7 @@
             <!-- 2번 패널: 누적현황 -->
             <div class="swipe-pane" id="pane-stats">
                 <div class="month-filter" id="stats-month-buttons"></div>
-                <!-- 🌟 누적현황 월별 버튼 밑에 고정되는 기준일자 텍스트 영역 -->
-                <div class="stats-current-date-box" id="stats-current-date-text">[ 2026년 11월 14일 현재 ]</div>
+                <div class="stats-current-date-box" id="stats-current-date-text">[ 2026년 11월 8일 기준 ]</div>
                 <div id="stats-list" class="loading">누적 데이터 계산 중...</div>
             </div>
         </div>
@@ -195,10 +194,9 @@
         { name: "조성국" }, { name: "최순규" }, { name: "최잔디" }, { name: "황연성" }
     ];
 
-    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v1')) || [...DEFAULT_MEMBERS];
-    
-    let rawLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v1')) || [];
-    let globalLogs = rawLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
+    // 🌟 일요운동 전용 로컬스토리지 키 사용 및 기존 데이터 완전 초기화 (빈 배열 [])
+    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v2')) || [...DEFAULT_MEMBERS];
+    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v2')) || [];
 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
 
@@ -238,7 +236,6 @@
         return `${years}년 ${months}월 ${days}일 ${weekDays[dateObj.getDay()]}`;
     }
 
-    /* 🌟 일요일 날짜들만 가져오도록 수정 (getDay() === 0) */
     function getAllSundaysOfCurrentYear() {
         const sundays = [];
         let d = new Date(currentYear, 0, 1);
@@ -435,65 +432,19 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_members_v1', JSON.stringify(globalMembers));
-        localStorage.setItem('boksakol_sunday_logs_v1', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_members_v2', JSON.stringify(globalMembers));
+        localStorage.setItem('boksakol_sunday_logs_v2', JSON.stringify(globalLogs));
     }
 
     async function loadDataFromSheet() {
-        try {
-            const res = await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: "getData" })
-            });
-            const resData = await res.json();
-            if (resData.status === "success") {
-                if (resData.members && Array.isArray(resData.members) && resData.members.length > 0) {
-                    globalMembers = resData.members;
-                }
-                if (resData.logs && Array.isArray(resData.logs)) {
-                    const uniqueMap = new Map();
-                    resData.logs.forEach(l => {
-                        const sNum = Number(l.score);
-                        if (l.name && l.date && [10, 5, 99].includes(sNum)) {
-                            const key = String(l.date).trim() + "_" + String(l.name).trim();
-                            uniqueMap.set(key, { name: String(l.name).trim(), date: String(l.date).trim(), score: sNum, month: l.month });
-                        }
-                    });
-                    globalLogs = Array.from(uniqueMap.values());
-                }
-                saveLocally();
-            }
-        } catch (e) {
-            console.error("구글 시트 로드 실패, 로컬 데이터 유지");
-        }
+        // 일요운동은 별도의 시트 데이터를 연동하지 않고 독립적으로 깨끗하게 시작하려면 아래 주석 처리 또는 유지
+        // 현재는 로컬 데이터를 초기화된 상태로 유지합니다.
         sortMembers();
     }
 
     async function saveDataToSheet() {
         sortMembers();
-        const uniqueMap = new Map();
-        globalLogs.forEach(l => {
-            const sNum = Number(l.score);
-            if (l.name && l.date && [10, 5, 99].includes(sNum)) {
-                const key = String(l.date).trim() + "_" + String(l.name).trim();
-                uniqueMap.set(key, { name: String(l.name).trim(), date: String(l.date).trim(), score: sNum, month: l.month });
-            }
-        });
-        globalLogs = Array.from(uniqueMap.values());
         saveLocally();
-
-        try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: "saveData",
-                    members: globalMembers,
-                    logs: globalLogs
-                })
-            });
-        } catch (e) {
-            console.error("구글 시트 저장 실패");
-        }
     }
 
     function toggleAdminMode() {
@@ -738,18 +689,33 @@
         const now = new Date();
         const y = now.getFullYear();
         const m = now.getMonth() + 1;
-        const d = now.getDate();
         
+        const getLatestSundayDateStr = (year, monthNum) => {
+            let targetDate = new Date(year, monthNum, 0);
+            while (targetDate.getDay() !== 0) {
+                targetDate.setDate(targetDate.getDate() - 1);
+            }
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            if (targetDate > today && monthNum === (today.getMonth() + 1)) {
+                targetDate = new Date(today);
+                while (targetDate.getDay() !== 0) {
+                    targetDate.setDate(targetDate.getDate() - 1);
+                }
+            }
+            return `${targetDate.getFullYear()}년 ${targetDate.getMonth() + 1}월 ${targetDate.getDate()}일 기준`;
+        };
+
         if (statsSelectedMonth === "전체") {
-            dateTextDiv.innerText = `[ ${y}년 ${m}월 ${d}일 현재 ]`;
+            let latestSun = new Date(now);
+            while (latestSun.getDay() !== 0) {
+                latestSun.setDate(latestSun.getDate() - 1);
+            }
+            dateTextDiv.innerText = `[ ${latestSun.getFullYear()}년 ${latestSun.getMonth() + 1}월 ${latestSun.getDate()}일 기준 ]`;
         } else {
             const mNum = parseInt(statsSelectedMonth.replace(/[^0-9]/g, ""), 10);
-            if (mNum === m) {
-                dateTextDiv.innerText = `[ ${y}년 ${m}월 ${d}일 현재 ]`;
-            } else {
-                const lastDay = new Date(y, mNum, 0).getDate();
-                dateTextDiv.innerText = `[ ${y}년 ${mNum}월 ${lastDay}일 기준 ]`;
-            }
+            const dateStrFormatted = getLatestSundayDateStr(y, mNum);
+            dateTextDiv.innerText = `[ ${dateStrFormatted} ]`;
         }
 
         if (!statsDiv) return;
