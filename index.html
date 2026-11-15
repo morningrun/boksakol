@@ -58,17 +58,13 @@
         .month-btn { padding: 6px 7.5px; font-size: 0.78rem; border: 1px solid var(--border); border-radius: 7px; background: #ffffff; cursor: pointer; font-weight: 700; color: var(--text-sub); }
         .month-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 6px rgba(37,99,235,0.25); }
 
-        /* 🌟 검색창 및 일일 통계 요약 박스 스타일 */
-        .search-box-container { margin-bottom: 8px; }
+        .search-box-container { margin-bottom: 10px; }
         .search-input { width: 100%; padding: 10px 12px; box-sizing: border-box; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; background: #f8fafc; }
         .search-input:focus { border-color: var(--accent); background: #ffffff; }
 
-        .daily-summary-box { background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 8px; padding: 9px 12px; margin-bottom: 10px; display: flex; justify-content: space-around; align-items: center; font-size: 0.82rem; font-weight: 800; color: #166534; text-align: center; }
-        .daily-summary-box span { font-weight: 900; color: var(--success); }
-
         .stats-current-date-box { text-align: center; font-size: 0.92rem; font-weight: 800; color: var(--accent); margin-top: 10px; margin-bottom: 10px; letter-spacing: -0.3px; }
 
-        .sunday-list-box { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
+        .sunday-list-box { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
         .sunday-list-title { font-size: 0.88rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
         .sunday-vertical-group { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
         
@@ -103,8 +99,11 @@
         .rank-card { display: flex; align-items: center; justify-content: space-between; padding: 10px 10px; margin-bottom: 7px; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 10px; gap: 4px; }
         .rank-number { font-weight: 800; color: var(--accent); width: 38px; font-size: 0.82rem; white-space: nowrap; flex-shrink: 0; }
         .rank-name { font-weight: 800; width: 52px; font-size: 0.9rem; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
-        .rank-detail { font-size: 0.62rem; color: var(--text-sub); font-weight: 700; text-align: center; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .rank-score { font-weight: 800; width: 44px; font-size: 0.95rem; color: var(--success); text-align: right; white-space: nowrap; flex-shrink: 0; }
+        .rank-detail { font-size: 0.7rem; color: var(--text-sub); font-weight: 700; text-align: center; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; justify-content: center; gap: 6px; }
+        .rank-detail .d-workout { color: #059669; font-weight: 800; }
+        .rank-detail .d-attend { color: #0284c7; font-weight: 800; }
+        .rank-detail .d-comp { color: #d97706; font-weight: 800; }
+        .rank-score { font-weight: 900; width: 50px; font-size: 1.05rem; color: var(--accent); text-align: right; white-space: nowrap; flex-shrink: 0; }
 
         .admin-panel { background: var(--primary); color: white; padding: 14px; border-radius: 12px; margin-top: 15px; margin-bottom: 12px; }
         .admin-panel h3 { margin: 0 0 10px 0; font-size: 1rem; color: #38bdf8; }
@@ -146,12 +145,8 @@
                     <div class="sunday-vertical-group" id="sunday-vertical-wrapper"></div>
                 </div>
 
-                <!-- 🌟 검색창 및 실시간 합산 요약 박스 -->
                 <div class="search-box-container">
                     <input type="text" id="member-search-input" class="search-input" placeholder="🔍 회원 이름 검색..." oninput="renderCheckinList()">
-                </div>
-                <div class="daily-summary-box" id="daily-summary-box">
-                    참석총인원: <span id="sum-total">0</span>명 | 참석(운동): <span id="sum-workout">0</span>명 | 참석: <span id="sum-attend">0</span>명 | 대회: <span id="sum-comp">0</span>명
                 </div>
 
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
@@ -217,8 +212,8 @@
         { name: "이호병" }, { name: "방지원" }, { name: "황연성" }, { name: "노진규" }
     ];
 
-    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v28')) || [...DEFAULT_MEMBERS];
-    let rawLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v28')) || [];
+    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v32')) || [...DEFAULT_MEMBERS];
+    let rawLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v32')) || [];
     let globalLogs = rawLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
@@ -455,8 +450,8 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_members_v28', JSON.stringify(globalMembers));
-        localStorage.setItem('boksakol_sunday_logs_v28', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_members_v32', JSON.stringify(globalMembers));
+        localStorage.setItem('boksakol_sunday_logs_v32', JSON.stringify(globalLogs));
     }
 
     async function loadDataFromSheet() {
@@ -602,29 +597,13 @@
         }
 
         const dayAttendance = {};
-        let countTotal = 0;
-        let countWorkout = 0;
-        let countAttend = 0;
-        let countComp = 0;
-
         globalLogs.forEach(log => {
             const sNum = Number(log.score);
             if (String(log.date).trim() === String(selectedDateStr).trim() && [10, 5, 99].includes(sNum)) {
                 dayAttendance[String(log.name).trim()] = sNum;
-                countTotal++;
-                if (sNum === 10) countWorkout++;
-                else if (sNum === 5) countAttend++;
-                else if (sNum === 99) countComp++;
             }
         });
 
-        // 🌟 상단 일일 통계 요약 박스 업데이트
-        document.getElementById('sum-total').innerText = countTotal;
-        document.getElementById('sum-workout').innerText = countWorkout;
-        document.getElementById('sum-attend').innerText = countAttend;
-        document.getElementById('sum-comp').innerText = countComp;
-
-        // 🌟 검색어 필터링 적용
         const searchInput = document.getElementById('member-search-input');
         const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
@@ -890,7 +869,11 @@
             card.innerHTML = `
                 <div class="rank-number">${rankBadge}</div>
                 <div class="rank-name">${item.name}</div>
-                <div class="rank-detail">참석(운동)${item.workout}·참석${item.attend}·대회${item.comp}</div>
+                <div class="rank-detail">
+                    <span class="d-workout">참석(운동)${item.workout}</span>·
+                    <span class="d-attend">참석${item.attend}</span>·
+                    <span class="d-comp">대회${item.comp}</span>
+                </div>
                 <div class="rank-score">${item.score}점</div>
             `;
             statsDiv.appendChild(card);
@@ -920,18 +903,11 @@
 
         swipeContainer.addEventListener('touchmove', (e) => {
             if (!isSwiping) return;
-            let currentX = e.touches[0].clientX;
-            let currentY = e.touches[0].clientY;
-            let diffX = Math.abs(currentX - startX);
-            let diffY = Math.abs(currentY - startY);
-            if (diffX > diffY) {
-                // 가로 스와이프 시 기본 스크롤 간섭 방지
-            }
         }, { passive: true });
 
         swipeContainer.addEventListener('touchend', (e) => {
             if (!isSwiping) return;
-            isSwisPreviewing = false;
+            isSwiping = false;
 
             let endX = e.changedTouches[0].clientX;
             let diff = startX - endX;
