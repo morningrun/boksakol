@@ -193,7 +193,7 @@
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPXWM6bKfUYZgRL5hC947VmRQgtB8RBrylaTtOO0Yb2zBVuRwIBUQtcqgNgiU9FEfuaA/exec";
 
-    // 🌟 보내주신 원본 84명 명단 순서 그대로 완벽 동기화 (1번 김창선 ~ 84번 노진규)
+    // 🌟 보내주신 84명 원본 명단 그대로 세팅
     const DEFAULT_MEMBERS = [
         { name: "김창선" }, { name: "방철규" }, { name: "정도영" }, { name: "정범희" }, 
         { name: "조한복" }, { name: "지덕수" }, { name: "필동만" }, { name: "이석형" }, 
@@ -218,14 +218,14 @@
         { name: "이호병" }, { name: "방지원" }, { name: "황연성" }, { name: "노진규" }
     ];
 
-    // v11 버전 키로 설정하여 이전 캐시를 완전히 지우고 정확한 원본 84명 명단 반영
-    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v11')) || [...DEFAULT_MEMBERS];
+    // v12 버전 키로 설정하여 이전 캐시를 완전히 지우고 최신 상태 반영
+    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v12')) || [...DEFAULT_MEMBERS];
     
     if (globalMembers.length !== DEFAULT_MEMBERS.length) {
         globalMembers = [...DEFAULT_MEMBERS];
     }
 
-    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v11')) || [];
+    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v12')) || [];
 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
 
@@ -452,16 +452,18 @@
     }
 
     function sortMembers() {
+        // 명단 데이터를 가나다순으로 정렬
         if (!Array.isArray(globalMembers) || globalMembers.length === 0) {
             globalMembers = [...DEFAULT_MEMBERS];
         }
-        // 원본 순서(가입순 등)를 유지하려면 아래 정렬을 주석 처리하면 되지만, 기본적으로 입력된 원본 순서를 그대로 보존합니다.
+        globalMembers.sort((a, b) => (a.name || "").localeCompare(b.name || "", 'ko'));
     }
 
     function saveLocally() {
+        sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_members_v11', JSON.stringify(globalMembers));
-        localStorage.setItem('boksakol_sunday_logs_v11', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_members_v12', JSON.stringify(globalMembers));
+        localStorage.setItem('boksakol_sunday_logs_v12', JSON.stringify(globalLogs));
     }
 
     function toggleAdminMode() {
@@ -518,6 +520,7 @@
         if (globalMembers.some(m => m.name === name)) { alert("이미 존재하는 회원 이름입니다."); return; }
         
         globalMembers.push({ name: name });
+        sortMembers();
         renderAdminMemberList();
         renderSundayVerticalList();
         renderStats();
@@ -531,6 +534,7 @@
         if (!confirm(`[${targetName}] 회원을 정말 삭제하시겠습니까?`)) return;
         
         globalMembers.splice(index, 1);
+        sortMembers();
         renderAdminMemberList();
         renderSundayVerticalList();
         renderStats();
@@ -546,6 +550,8 @@
         if (!globalMembers || globalMembers.length === 0) {
             globalMembers = [...DEFAULT_MEMBERS];
         }
+
+        sortMembers();
 
         const dayAttendance = {};
         globalLogs.forEach(log => {
@@ -584,10 +590,6 @@
             if (groupA !== groupB) {
                 return groupA - groupB;
             }
-            // 이름 검색 상태가 아닐 때는 원본 배열 순서 유지
-            if (!keyword) {
-                return globalMembers.findIndex(m => m.name === nameA) - globalMembers.findIndex(m => m.name === nameB);
-            }
             return nameA.localeCompare(nameB, 'ko');
         });
 
@@ -601,8 +603,8 @@
             const name = String(member.name || "").trim();
             if (!name) return;
             
-            // 원래 명단 속 고유 번호(1번~84번) 찾기
-            const originalIndex = globalMembers.findIndex(m => m.name === name);
+            // 가나다순 정렬된 배열 안에서의 인덱스 번호 (1번부터 시작)
+            const displayIndex = globalMembers.findIndex(m => m.name === name);
 
             const score = dayAttendance[name] || 0;
             const isChecked = [10, 5, 99].includes(score);
@@ -627,7 +629,7 @@
             info.className = 'member-info';
             const nameDiv = document.createElement('div');
             nameDiv.className = 'member-name';
-            nameDiv.innerHTML = `<span class="member-index">${originalIndex + 1}.</span> ${name}`;
+            nameDiv.innerHTML = `<span class="member-index">${displayIndex + 1}.</span> ${name}`;
             const badgeDiv = document.createElement('div');
             badgeDiv.innerHTML = badgeHtml;
             info.appendChild(nameDiv);
