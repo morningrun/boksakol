@@ -919,7 +919,7 @@
             `;
             statsDiv.appendChild(card);
         });
-        updateSwipeWrapperHeight(); // 🌟 오류 수정 완료
+        updateSwipeWrapperHeight();
     }
 
     function initEventBindings() {
@@ -974,10 +974,9 @@
         initStatsMonthButtons();
         sortMembers();
         
-        renderSundayVerticalList();
-        renderStats();
-        
+        // 🌟 앱 실행 시 구글 시트의 최신 데이터를 먼저 불러온 후 화면을 렌더링합니다.
         await loadDataFromSheet();
+        
         renderSundayVerticalList();
         renderStats();
     }
