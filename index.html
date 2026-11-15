@@ -25,9 +25,9 @@
         :root {
             --primary: #0f172a;
             --accent: #2563eb;
-            --success: #059669;    /* 참석(운동) (10점) - 녹색 */
-            --info: #0284c7;        /* 참석 (5점) - 파란색 */
-            --warning: #d97706;    /* 대회 (10점) - 주황색 */
+            --success: #059669;    
+            --info: #0284c7;        
+            --warning: #d97706;    
             --danger: #dc2626;
             --bg-color: #f1f5f9;
             --card-bg: #ffffff;
@@ -127,10 +127,8 @@
         <button class="tab-btn" id="tab-stats-btn">🏆 <span id="current-year-text">2026</span>년 누적현황</button>
     </div>
 
-    <!-- 좌우 스와이프 영역 -->
     <div class="swipe-wrapper" id="swipe-wrapper">
         <div id="swipe-container" class="swipe-container">
-            <!-- 1번 패널: 출석체크 -->
             <div class="swipe-pane active-pane" id="pane-checkin">
                 <div class="month-filter" id="checkin-month-buttons"></div>
                 
@@ -142,7 +140,6 @@
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
             </div>
 
-            <!-- 2번 패널: 누적현황 -->
             <div class="swipe-pane" id="pane-stats">
                 <div class="month-filter" id="stats-month-buttons"></div>
                 <div class="stats-current-date-box" id="stats-current-date-text">[ 2026년 11월 15일 현재 ]</div>
@@ -151,7 +148,6 @@
         </div>
     </div>
 
-    <!-- 관리자 회원 관리 패널 -->
     <div id="admin-panel" class="admin-panel hidden">
         <h3>🔒 관리자 설정 및 회원 관리</h3>
         
@@ -170,17 +166,15 @@
         <button onclick="toggleAdminMode()" style="width:100%; margin-top:12px; background:#475569; color:white; border:none; padding:9px; border-radius:7px; cursor:pointer; font-weight:800;">설정 닫기</button>
     </div>
 
-    <!-- 우측 하단 구석 톱니바퀴 기호 버튼 -->
     <div class="footer-setting-box">
         <button class="admin-gear-icon-btn" id="admin-open-btn" title="관리자 설정">⚙️</button>
     </div>
 </div>
 
 <script>
-    // 복사골 전용 구글 앱스 스크립트 웹앱 URL 입력 (기존 사용 중인 주소 유지)
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbip1-wehDnk1UTaOjz7xMna3vPzAF89jb-L2vPISKF2Ow95qZkjv4NCM60WwTc5W3Q/exec";
+    // 🌟 새로 발급받은 구글 앱스 스크립트 웹앱 URL을 입력하세요
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZ7KgV8tFW8i6PX1K3s1oQpTkN0CEI2gfOAhl6DTyCXoqIqzW95TI5DvDks0OC44dAHg/exec";
 
-    // 84명 전체 원본 명단 고정
     const DEFAULT_MEMBERS = [
         { name: "김창선" }, { name: "방철규" }, { name: "정도영" }, { name: "정범희" }, 
         { name: "조한복" }, { name: "지덕수" }, { name: "필동만" }, { name: "이석형" }, 
@@ -205,9 +199,8 @@
         { name: "이호병" }, { name: "방지원" }, { name: "황연성" }, { name: "노진규" }
     ];
 
-    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v25')) || [...DEFAULT_MEMBERS];
-    
-    let rawLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v25')) || [];
+    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v27')) || [...DEFAULT_MEMBERS];
+    let rawLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v27')) || [];
     let globalLogs = rawLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
@@ -444,8 +437,8 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_members_v25', JSON.stringify(globalMembers));
-        localStorage.setItem('boksakol_sunday_logs_v25', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_members_v27', JSON.stringify(globalMembers));
+        localStorage.setItem('boksakol_sunday_logs_v27', JSON.stringify(globalLogs));
     }
 
     async function loadDataFromSheet() {
@@ -915,6 +908,7 @@
         renderSundayVerticalList();
         renderStats();
         
+        // 🌟 앱 실행 시 구글 시트에서 최신 데이터를 먼저 불러옴
         await loadDataFromSheet();
         renderSundayVerticalList();
         renderStats();
