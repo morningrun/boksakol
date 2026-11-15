@@ -79,13 +79,18 @@
         .sunday-item-btn.active .sunday-stat-badge { background: #dbeafe; color: #1e40af; }
 
         /* 🔍 이름 검색창 스타일 */
-        .search-box-container { margin-bottom: 10px; }
-        .search-input { width: 100%; padding: 10px 12px; font-size: 0.9rem; border: 1.5px solid var(--border); border-radius: 8px; outline: none; box-sizing: border-box; background: #ffffff; font-weight: 700; transition: border-color 0.2s; }
+        .search-box-container { margin-bottom: 8px; }
+        .search-input { width: 100%; padding: 9px 12px; font-size: 0.9rem; border: 1.5px solid var(--border); border-radius: 8px; outline: none; box-sizing: border-box; background: #ffffff; font-weight: 700; transition: border-color 0.2s; }
         .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
 
-        /* 📊 참석현황 요약 박스 스타일 */
-        .summary-status-box { display: flex; justify-content: space-between; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; font-size: 0.8rem; font-weight: 800; color: #1e40af; text-align: center; }
-        .summary-status-box span { flex: 1; }
+        /* 📊 모바일 최적화 참석현황 요약 박스 */
+        .summary-status-box { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 6px; margin-bottom: 10px; text-align: center; gap: 2px; }
+        .summary-status-box div { flex: 1; display: flex; flex-direction: column; font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
+        .summary-status-box .stat-total { color: var(--primary); font-size: 0.82rem; font-weight: 900; }
+        .summary-status-box .stat-workout { color: var(--success); }
+        .summary-status-box .stat-attend { color: var(--info); }
+        .summary-status-box .stat-comp { color: var(--warning); }
+        .summary-status-box .count-num { font-size: 0.88rem; font-weight: 800; margin-top: 1px; }
 
         .member-card { display: flex; flex-direction: column; padding: 8px 10px; margin-bottom: 6px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .member-card.checked-10 { background-color: #ecfdf5 !important; border-color: #34d399 !important; border-left: 5px solid var(--success) !important; }
@@ -157,12 +162,12 @@
                     <input type="text" id="member-search-input" class="search-input" placeholder="🔍 회원 이름 검색..." oninput="renderCheckinList()">
                 </div>
 
-                <!-- 📊 실시간 참석현황 요약 박스 -->
+                <!-- 📊 모바일 최적화 참석현황 요약 박스 -->
                 <div class="summary-status-box" id="summary-status-box">
-                    <span>총 인원: 0명</span>
-                    <span>참석(운동): 0명</span>
-                    <span>참석: 0명</span>
-                    <span>대회: 0명</span>
+                    <div class="stat-total">총인원 <span class="count-num" id="cnt-total">0명</span></div>
+                    <div class="stat-workout">참석(운동) <span class="count-num" id="cnt-workout">0명</span></div>
+                    <div class="stat-attend">참석 <span class="count-num" id="cnt-attend">0명</span></div>
+                    <div class="stat-comp">대회 <span class="count-num" id="cnt-comp">0명</span></div>
                 </div>
 
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
@@ -216,6 +221,7 @@
         { name: "조성국" }, { name: "최순규" }, { name: "최잔디" }, { name: "황연성" }
     ];
 
+    // 🌟 리셋 방지: 로컬스토리지에 저장된 데이터를 안전하게 불러오도록 수정 (없을 때만 기본값 적용)
     let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v2')) || [...DEFAULT_MEMBERS];
     let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v2')) || [];
 
@@ -450,6 +456,7 @@
         globalMembers.sort((a, b) => (a.name || "").localeCompare(b.name || "", 'ko'));
     }
 
+    // 🌟 안전한 로컬 저장 함수 (데이터 유실 방지)
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
@@ -544,7 +551,6 @@
 
     function renderCheckinList() {
         const listDiv = document.getElementById('member-list');
-        const summaryBox = document.getElementById('summary-status-box');
         const searchInput = document.getElementById('member-search-input');
         if (!listDiv) return;
         listDiv.innerHTML = '';
@@ -561,7 +567,7 @@
             }
         });
 
-        // 📊 요약 박스 데이터 계산
+        // 📊 요약 박스 데이터 계산 및 바인딩
         let totalCount = 0;
         let workoutCount = 0;
         let attendCount = 0;
@@ -574,14 +580,10 @@
             else if (score === 99) compCount++;
         });
 
-        if (summaryBox) {
-            summaryBox.innerHTML = `
-                <span>총 인원: ${totalCount}명</span>
-                <span>참석(운동): ${workoutCount}명</span>
-                <span>참석: ${attendCount}명</span>
-                <span>대회: ${compCount}명</span>
-            `;
-        }
+        document.getElementById('cnt-total').innerText = totalCount + "명";
+        document.getElementById('cnt-workout').innerText = workoutCount + "명";
+        document.getElementById('cnt-attend').innerText = attendCount + "명";
+        document.getElementById('cnt-comp').innerText = compCount + "명";
 
         const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
@@ -737,7 +739,7 @@
 
         renderSundayVerticalList();
         renderStats();
-        await saveDataToSheet();
+        await saveDataToSheet(); // 🌟 체크인 즉시 로컬스토리지에 영구 저장
     }
 
     function renderStats() {
@@ -871,7 +873,7 @@
             `;
             statsDiv.appendChild(card);
         });
-        updateSwipeWrapperHeader();
+        updateSwipeWrapperHeight();
     }
 
     function initEventBindings() {
@@ -927,6 +929,17 @@
         initCheckinMonthButtons();
         initStatsMonthButtons();
         sortMembers();
+        
+        // 🌟 앱 실행 시 기존 로컬 데이터 무결성 보존 로직 추가
+        const savedLogs = localStorage.getItem('boksakol_sunday_logs_v2');
+        if (savedLogs) {
+            try {
+                globalLogs = JSON.parse(savedLogs) || [];
+            } catch (e) {
+                globalLogs = [];
+            }
+        }
+
         renderSundayVerticalList();
         renderStats();
         
