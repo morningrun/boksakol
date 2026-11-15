@@ -209,8 +209,15 @@
         { name: "필동만" }, { name: "황문섭" }, { name: "황연성" }
     ];
 
-    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v2')) || [...DEFAULT_MEMBERS];
-    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v2')) || [];
+    // 🌟 버전 키를 업그레이드(v3)하여 이전 캐시를 무시하고 84명 전체 명단이 강제로 로드되도록 설정
+    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v3')) || [...DEFAULT_MEMBERS];
+    
+    // 만약 기존 저장된 멤버 수가 84명보다 적다면 최신 84명 명단으로 강제 갱신
+    if (globalMembers.length < DEFAULT_MEMBERS.length) {
+        globalMembers = [...DEFAULT_MEMBERS];
+    }
+
+    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v3')) || [];
 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
 
@@ -446,8 +453,8 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_members_v2', JSON.stringify(globalMembers));
-        localStorage.setItem('boksakol_sunday_logs_v2', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_members_v3', JSON.stringify(globalMembers));
+        localStorage.setItem('boksakol_sunday_logs_v3', JSON.stringify(globalLogs));
     }
 
     async function loadDataFromSheet() {
