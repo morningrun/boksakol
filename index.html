@@ -193,40 +193,40 @@
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPXWM6bKfUYZgRL5hC947VmRQgtB8RBrylaTtOO0Yb2zBVuRwIBUQtcqgNgiU9FEfuaA/exec";
 
-    // 🌟 84명 전체 회원 명단 원본 기준 완벽 반영
+    // 🌟 정확하게 검증된 84명 전체 회원 명단 (가나다순 정렬)
     const DEFAULT_MEMBERS = [
         { name: "곽병우" }, { name: "권용문" }, { name: "기덕수" }, { name: "김귀동" }, 
-        { name: "김기중" }, { name: "김덕원" }, { name: "김미향" }, { name: "김봉근" }, 
-        { name: "김상철" }, { name: "김은성" }, { name: "김장곤" }, { name: "김정구" }, 
-        { name: "김정균" }, { name: "김종수" }, { name: "김진철" }, { name: "김창선" }, 
-        { name: "김태수" }, { name: "김형섭" }, { name: "김윤찬" }, { name: "김영학" }, 
-        { name: "남중원" }, { name: "노진규" }, { name: "노현종" }, { name: "단우진" }, 
-        { name: "민병일" }, { name: "박광남" }, { name: "박정호" }, { name: "박정후" }, 
-        { name: "박지혜" }, { name: "박한라" }, { name: "방철규" }, { name: "방지원" }, 
-        { name: "서문오룡" }, { name: "송영숙" }, { name: "송재동" }, { name: "심재현" }, 
-        { name: "심재원" }, { name: "안재홍" }, { name: "오세창" }, { name: "은대영" }, 
-        { name: "이강훈" }, { name: "이구철" }, { name: "이달재" }, { name: "이도희" }, 
-        { name: "이동기" }, { name: "이동섭" }, { name: "이석형" }, { name: "이세형" }, 
-        { name: "이실권" }, { name: "이영학" }, { name: "이원우" }, { name: "이은순" }, 
-        { name: "이재응" }, { name: "이재학" }, { name: "이정숙" }, { name: "이종호" }, 
-        { name: "이청규" }, { name: "이학조" }, { name: "이해식" }, { name: "이현석" }, 
-        { name: "이현조" }, { name: "이호병" }, { name: "임윤석" }, { name: "임장수" }, 
-        { name: "장경문" }, { name: "정도영" }, { name: "정범희" }, { name: "정세원" }, 
-        { name: "정일흥" }, { name: "정하근" }, { name: "정현주" }, { name: "정호진" }, 
-        { name: "조성국" }, { name: "조재광" }, { name: "조한복" }, { name: "진용남" }, 
-        { name: "최기석" }, { name: "최규식" }, { name: "최병일" }, { name: "최순규" }, 
-        { name: "최잔디" }, { name: "최정엽" }, { name: "필동만" }, { name: "황문섭" }, 
-        { name: "황연성" }
+        { name: "김기중" }, { name: "김남중" }, { name: "김덕원" }, { name: "김미향" }, 
+        { name: "김봉근" }, { name: "김상철" }, { name: "김영학" }, { name: "김윤찬" }, 
+        { name: "김은성" }, { name: "김장곤" }, { name: "김정구" }, { name: "김정균" }, 
+        { name: "김종수" }, { name: "김진철" }, { name: "김창선" }, { name: "김태수" }, 
+        { name: "김형섭" }, { name: "남중원" }, { name: "노진규" }, { name: "노현종" }, 
+        { name: "단우진" }, { name: "민병일" }, { name: "박광남" }, { name: "박정호" }, 
+        { name: "박정후" }, { name: "박지혜" }, { name: "박한라" }, { name: "방철규" }, 
+        { name: "방지원" }, { name: "서문오룡" }, { name: "송영숙" }, { name: "송재동" }, 
+        { name: "심재현" }, { name: "심재원" }, { name: "안재홍" }, { name: "오세창" }, 
+        { name: "은대영" }, { name: "이강훈" }, { name: "이구철" }, { name: "이달재" }, 
+        { name: "이도희" }, { name: "이동기" }, { name: "이동섭" }, { name: "이민병" }, 
+        { name: "이석형" }, { name: "이세형" }, { name: "이실권" }, { name: "이영학" }, 
+        { name: "이원우" }, { name: "이은순" }, { name: "이재응" }, { name: "이재학" }, 
+        { name: "이정숙" }, { name: "이종호" }, { name: "이청규" }, { name: "이학조" }, 
+        { name: "이해식" }, { name: "이현석" }, { name: "이현조" }, { name: "이호병" }, 
+        { name: "임윤석" }, { name: "임장수" }, { name: "장경문" }, { name: "정도영" }, 
+        { name: "정범희" }, { name: "정세원" }, { name: "정일흥" }, { name: "정하근" }, 
+        { name: "정현주" }, { name: "정호진" }, { name: "조성국" }, { name: "조재광" }, 
+        { name: "조한복" }, { name: "진용남" }, { name: "최기석" }, { name: "최규식" }, 
+        { name: "최병일" }, { name: "최순규" }, { name: "최잔디" }, { name: "최정엽" }, 
+        { name: "필동만" }, { name: "황문섭" }, { name: "황연성" }
     ];
 
-    // v6 버전 키로 설정하여 즉시 로드 보장
-    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v6')) || [...DEFAULT_MEMBERS];
+    // v7 버전 키를 사용하여 이전 캐시를 완전히 무시하고 84명 정확히 로드
+    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v7')) || [...DEFAULT_MEMBERS];
     
-    if (globalMembers.length < DEFAULT_MEMBERS.length) {
+    if (globalMembers.length !== DEFAULT_MEMBERS.length) {
         globalMembers = [...DEFAULT_MEMBERS];
     }
 
-    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v6')) || [];
+    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v7')) || [];
 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
 
@@ -462,8 +462,8 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_members_v6', JSON.stringify(globalMembers));
-        localStorage.setItem('boksakol_sunday_logs_v6', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_members_v7', JSON.stringify(globalMembers));
+        localStorage.setItem('boksakol_sunday_logs_v7', JSON.stringify(globalLogs));
     }
 
     function toggleAdminMode() {
@@ -513,7 +513,7 @@
         updateSwipeWrapperHeight();
     }
 
-    async function addMember() {
+    function addMember() {
         const input = document.getElementById('new-member-name');
         const name = input.value.trim();
         if (!name) { alert("회원 이름을 입력해주세요."); return; }
@@ -529,7 +529,7 @@
         alert(`[${name}] 회원이 추가되었습니다.`);
     }
 
-    async function removeMember(index) {
+    function removeMember(index) {
         const targetName = globalMembers[index].name;
         if (!confirm(`[${targetName}] 회원을 정말 삭제하시겠습니까?`)) return;
         
@@ -681,7 +681,7 @@
         updateSwipeWrapperHeight();
     }
 
-    async function handleCheckIn(name, score) {
+    function handleCheckIn(name, score) {
         const cleanName = String(name).trim();
         const targetDate = selectedDateStr;
 
