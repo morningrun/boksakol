@@ -234,13 +234,13 @@
         { name: "이호병" }, { name: "방지원" }, { name: "황연성" }, { name: "노진규" }
     ];
 
-    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v12')) || [...DEFAULT_MEMBERS];
+    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v13')) || [...DEFAULT_MEMBERS];
     
     if (globalMembers.length !== DEFAULT_MEMBERS.length) {
         globalMembers = [...DEFAULT_MEMBERS];
     }
 
-    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v12')) || [];
+    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v13')) || [];
 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
 
@@ -476,8 +476,8 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_members_v12', JSON.stringify(globalMembers));
-        localStorage.setItem('boksakol_sunday_logs_v12', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_members_v13', JSON.stringify(globalMembers));
+        localStorage.setItem('boksakol_sunday_logs_v13', JSON.stringify(globalLogs));
     }
 
     function toggleAdminMode() {
@@ -575,7 +575,6 @@
             }
         });
 
-        // 🌟 현재 선택된 날짜의 출석 유형별 인원수 계산
         let countWorkout = 0;
         let countAttend = 0;
         let countComp = 0;
@@ -587,7 +586,6 @@
         });
         let countTotal = countWorkout + countAttend + countComp;
 
-        // 요약 보드 UI 업데이트
         const board = document.getElementById('day-summary-board');
         if (board) {
             board.innerHTML = `
@@ -598,7 +596,6 @@
             `;
         }
 
-        // 검색어 필터링 적용
         const searchInput = document.getElementById('member-search-input');
         const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
