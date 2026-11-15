@@ -78,6 +78,15 @@
         .sunday-stat-badge { font-size: 0.75rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 3px 8px; border-radius: 5px; display: inline-block; width: fit-content; }
         .sunday-item-btn.active .sunday-stat-badge { background: #dbeafe; color: #1e40af; }
 
+        /* 🔍 이름 검색창 스타일 */
+        .search-box-container { margin-bottom: 10px; }
+        .search-input { width: 100%; padding: 10px 12px; font-size: 0.9rem; border: 1.5px solid var(--border); border-radius: 8px; outline: none; box-sizing: border-box; background: #ffffff; font-weight: 700; transition: border-color 0.2s; }
+        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+        /* 📊 참석현황 요약 박스 스타일 */
+        .summary-status-box { display: flex; justify-content: space-between; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; font-size: 0.8rem; font-weight: 800; color: #1e40af; text-align: center; }
+        .summary-status-box span { flex: 1; }
+
         .member-card { display: flex; flex-direction: column; padding: 8px 10px; margin-bottom: 6px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .member-card.checked-10 { background-color: #ecfdf5 !important; border-color: #34d399 !important; border-left: 5px solid var(--success) !important; }
         .member-card.checked-5 { background-color: #f0f9ff !important; border-color: #38bdf8 !important; border-left: 5px solid var(--info) !important; }
@@ -143,6 +152,19 @@
                     <div class="sunday-vertical-group" id="sunday-vertical-wrapper"></div>
                 </div>
 
+                <!-- 🔍 이름 검색창 -->
+                <div class="search-box-container">
+                    <input type="text" id="member-search-input" class="search-input" placeholder="🔍 회원 이름 검색..." oninput="renderCheckinList()">
+                </div>
+
+                <!-- 📊 실시간 참석현황 요약 박스 -->
+                <div class="summary-status-box" id="summary-status-box">
+                    <span>총 인원: 0명</span>
+                    <span>참석(운동): 0명</span>
+                    <span>참석: 0명</span>
+                    <span>대회: 0명</span>
+                </div>
+
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
             </div>
 
@@ -194,7 +216,6 @@
         { name: "조성국" }, { name: "최순규" }, { name: "최잔디" }, { name: "황연성" }
     ];
 
-    // 🌟 일요운동 전용 로컬스토리지 키 사용 및 기존 데이터 완전 초기화 (빈 배열 [])
     let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v2')) || [...DEFAULT_MEMBERS];
     let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v2')) || [];
 
@@ -437,8 +458,6 @@
     }
 
     async function loadDataFromSheet() {
-        // 일요운동은 별도의 시트 데이터를 연동하지 않고 독립적으로 깨끗하게 시작하려면 아래 주석 처리 또는 유지
-        // 현재는 로컬 데이터를 초기화된 상태로 유지합니다.
         sortMembers();
     }
 
@@ -525,6 +544,8 @@
 
     function renderCheckinList() {
         const listDiv = document.getElementById('member-list');
+        const summaryBox = document.getElementById('summary-status-box');
+        const searchInput = document.getElementById('member-search-input');
         if (!listDiv) return;
         listDiv.innerHTML = '';
 
@@ -539,6 +560,30 @@
                 dayAttendance[String(log.name).trim()] = sNum;
             }
         });
+
+        // 📊 요약 박스 데이터 계산
+        let totalCount = 0;
+        let workoutCount = 0;
+        let attendCount = 0;
+        let compCount = 0;
+
+        Object.values(dayAttendance).forEach(score => {
+            totalCount++;
+            if (score === 10) workoutCount++;
+            else if (score === 5) attendCount++;
+            else if (score === 99) compCount++;
+        });
+
+        if (summaryBox) {
+            summaryBox.innerHTML = `
+                <span>총 인원: ${totalCount}명</span>
+                <span>참석(운동): ${workoutCount}명</span>
+                <span>참석: ${attendCount}명</span>
+                <span>대회: ${compCount}명</span>
+            `;
+        }
+
+        const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
         const getGroupOrder = (score) => {
             if (score === 10) return 1;
@@ -563,10 +608,18 @@
             return nameA.localeCompare(nameB, 'ko');
         });
 
+        let renderedCount = 0;
+
         sortedMembers.forEach((member, index) => {
             const name = String(member.name || "").trim();
             if (!name) return;
-            
+
+            // 검색어 필터링
+            if (searchQuery && !name.toLowerCase().includes(searchQuery)) {
+                return;
+            }
+
+            renderedCount++;
             const score = dayAttendance[name] || 0;
             const isChecked = [10, 5, 99].includes(score);
 
@@ -644,6 +697,11 @@
             card.appendChild(buttonGroup);
             listDiv.appendChild(card);
         });
+
+        if (renderedCount === 0) {
+            listDiv.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8; font-weight:700;'>검색된 회원이 없습니다.</div>";
+        }
+
         updateSwipeWrapperHeight();
     }
 
@@ -813,7 +871,7 @@
             `;
             statsDiv.appendChild(card);
         });
-        updateSwipeWrapperHeight();
+        updateSwipeWrapperHeader();
     }
 
     function initEventBindings() {
