@@ -488,6 +488,7 @@
         localStorage.setItem('boksakol_sunday_logs_v2', JSON.stringify(globalLogs));
     }
 
+    // 🌟 1. 데이터 로드 안정성 강화 (통신 실패 시 로컬 데이터 보호)
     async function loadDataFromSheet() {
         sortMembers();
         if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_SCRIPT_ID")) return;
@@ -495,11 +496,18 @@
             const res = await fetch(GOOGLE_SCRIPT_URL);
             const result = await res.json();
             if (result.status === "success" && Array.isArray(result.logs)) {
-                globalLogs = result.logs;
-                saveLocally();
+                if (result.logs.length > 0) {
+                    globalLogs = result.logs.map(log => ({
+                        name: String(log.name || "").trim(),
+                        date: String(log.date || "").trim(),
+                        score: Number(log.score),
+                        month: Number(log.month) || 0
+                    })).filter(log => log.name && log.date && [10, 5, 99].includes(log.score));
+                    saveLocally();
+                }
             }
         } catch (e) {
-            console.error("구글 시트 데이터 로드 실패:", e);
+            console.error("구글 시트 데이터 로드 실패 (기존 로컬 데이터 유지):", e);
         }
     }
 
@@ -608,7 +616,11 @@
         const dayAttendance = {};
         globalLogs.forEach(log => {
             const sNum = Number(log.score);
-            if (String(log.date).trim() === String(selectedDateStr).trim() && [10, 5, 99].includes(sNum)) {
+            // 🌟 2. 날짜 비교 시 요일/공백 차이 무관하게 숫자 기준 정밀 매칭
+            const logDateClean = String(log.date || "").replace(/[^0-9]/g, '');
+            const selectedDateClean = String(selectedDateStr || "").replace(/[^0-9]/g, '');
+
+            if (logDateClean && selectedDateClean && logDateClean === selectedDateClean && [10, 5, 99].includes(sNum)) {
                 dayAttendance[String(log.name).trim()] = sNum;
             }
         });
@@ -771,7 +783,13 @@
             if (!confirm(`[${targetDate.replace(/^\d{4}년\s*/, '')}] [${cleanName}]님을 [${label}]으로 기록하시겠습니까?`)) return;
         }
 
-        globalLogs = globalLogs.filter(log => !(String(log.name).trim() === cleanName && String(log.date).trim() === targetDate));
+        // 날짜 숫자 비교를 통해 기존 해당일 기록 제거
+        const targetDateClean = String(targetDate).replace(/[^0-9]/g, '');
+        globalLogs = globalLogs.filter(log => {
+            const logDateClean = String(log.date || "").replace(/[^0-9]/g, '');
+            const logNameClean = String(log.name || "").trim();
+            return !(logNameClean === cleanName && logDateClean === targetDateClean);
+        });
         
         if ([10, 5, 99].includes(score)) {
             let mMatch = targetDate.match(/(\d+)월/);
@@ -835,9 +853,11 @@
         const uniqueLogs = new Map();
         globalLogs.forEach(log => {
             const sNum = Number(log.score);
-            if (log.name && log.date && [10, 5, 99].includes(sNum)) {
-                const key = String(log.date).trim() + "_" + String(log.name).trim();
-                uniqueLogs.set(key, { name: String(log.name).trim(), date: String(log.date).trim(), score: sNum, month: log.month });
+            const cleanName = String(log.name || "").trim();
+            const cleanDate = String(log.date || "").replace(/[^0-9]/g, '');
+            if (cleanName && cleanDate && [10, 5, 99].includes(sNum)) {
+                const key = cleanDate + "_" + cleanName;
+                uniqueLogs.set(key, { name: cleanName, date: log.date, score: sNum, month: log.month });
             }
         });
 
@@ -968,13 +988,14 @@
         });
     }
 
+    // 🌟 3. 앱 실행 순서 정비 (시트 데이터를 확실히 불러온 뒤 화면을 그림)
     async function initApp() {
         initEventBindings();
         initCheckinMonthButtons();
         initStatsMonthButtons();
         sortMembers();
         
-        // 🌟 앱 실행 시 구글 시트의 최신 데이터를 먼저 불러온 후 화면을 렌더링합니다.
+        // 구글 시트에서 최신 데이터를 완전히 불러올 때까지 대기
         await loadDataFromSheet();
         
         renderSundayVerticalList();
