@@ -62,9 +62,17 @@
         .month-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 6px rgba(37,99,235,0.25); }
 
         /* 회원 검색창 스타일 */
-        .search-box { margin-bottom: 10px; }
+        .search-box { margin-bottom: 8px; }
         .search-input { width: 100%; padding: 10px 12px; font-size: 0.9rem; border: 1.5px solid var(--border); border-radius: 8px; background: #f8fafc; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
         .search-input:focus { border-color: var(--accent); background: #ffffff; }
+
+        /* 선택된 날짜 당일 출석 요약 보드 스타일 */
+        .day-summary-board { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 9px; padding: 9px 12px; margin-bottom: 12px; display: flex; justify-content: space-around; align-items: center; font-size: 0.82rem; font-weight: 700; color: var(--text-sub); }
+        .day-summary-board span b { font-size: 0.9rem; }
+        .day-summary-board .sum-workout { color: var(--success); }
+        .day-summary-board .sum-attend { color: var(--info); }
+        .day-summary-board .sum-comp { color: var(--warning); }
+        .day-summary-board .sum-total { color: var(--primary); font-weight: 800; }
 
         /* 누적현황 기준일자 텍스트 간격 조정 */
         .stats-current-date-box { text-align: center; font-size: 0.92rem; font-weight: 800; color: var(--accent); margin-top: 10px; margin-bottom: 10px; letter-spacing: -0.3px; }
@@ -153,6 +161,14 @@
                     <input type="text" id="member-search-input" class="search-input" placeholder="🔍 회원 이름 검색 (예: 이실권)" oninput="renderCheckinList()">
                 </div>
 
+                <!-- 📊 선택된 날짜 당일 출석 요약 보드 -->
+                <div class="day-summary-board" id="day-summary-board">
+                    <span>참석(운동): <b class="sum-workout">0</b>명</span>
+                    <span>참석: <b class="sum-attend">0</b>명</span>
+                    <span>대회: <b class="sum-comp">0</b>명</span>
+                    <span>총원: <b class="sum-total">0</b>명</span>
+                </div>
+
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
             </div>
 
@@ -218,7 +234,6 @@
         { name: "이호병" }, { name: "방지원" }, { name: "황연성" }, { name: "노진규" }
     ];
 
-    // v12 버전 키로 설정하여 이전 캐시를 완전히 지우고 최신 상태 반영
     let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v12')) || [...DEFAULT_MEMBERS];
     
     if (globalMembers.length !== DEFAULT_MEMBERS.length) {
@@ -452,7 +467,6 @@
     }
 
     function sortMembers() {
-        // 명단 데이터를 가나다순으로 정렬
         if (!Array.isArray(globalMembers) || globalMembers.length === 0) {
             globalMembers = [...DEFAULT_MEMBERS];
         }
@@ -561,6 +575,29 @@
             }
         });
 
+        // 🌟 현재 선택된 날짜의 출석 유형별 인원수 계산
+        let countWorkout = 0;
+        let countAttend = 0;
+        let countComp = 0;
+
+        Object.values(dayAttendance).forEach(s => {
+            if (s === 10) countWorkout++;
+            else if (s === 5) countAttend++;
+            else if (s === 99) countComp++;
+        });
+        let countTotal = countWorkout + countAttend + countComp;
+
+        // 요약 보드 UI 업데이트
+        const board = document.getElementById('day-summary-board');
+        if (board) {
+            board.innerHTML = `
+                <span>참석(운동): <b class="sum-workout">${countWorkout}</b>명</span>
+                <span>참석: <b class="sum-attend">${countAttend}</b>명</span>
+                <span>대회: <b class="sum-comp">${countComp}</b>명</span>
+                <span>총원: <b class="sum-total">${countTotal}</b>명</span>
+            `;
+        }
+
         // 검색어 필터링 적용
         const searchInput = document.getElementById('member-search-input');
         const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
@@ -603,7 +640,6 @@
             const name = String(member.name || "").trim();
             if (!name) return;
             
-            // 가나다순 정렬된 배열 안에서의 인덱스 번호 (1번부터 시작)
             const displayIndex = globalMembers.findIndex(m => m.name === name);
 
             const score = dayAttendance[name] || 0;
