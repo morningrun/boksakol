@@ -176,7 +176,7 @@
             <!-- 2번 패널: 누적현황 -->
             <div class="swipe-pane" id="pane-stats">
                 <div class="month-filter" id="stats-month-buttons"></div>
-                <div class="stats-current-date-box" id="stats-current-date-text">[ 2026년 11월 8일 기준 ]</div>
+                <div class="stats-current-date-box" id="stats-current-date-text">[ 기준일자 ]</div>
                 <div id="stats-list" class="loading">누적 데이터 계산 중...</div>
             </div>
         </div>
@@ -198,6 +198,11 @@
             <button onclick="addMember()">회원 추가</button>
         </div>
         <div id="admin-member-list"></div>
+
+        <!-- 🌟 시트 전체 초기화(0으로 만들기) 버튼 -->
+        <h3 style="margin-top:14px; color:#fca5a5;">⚠️ 데이터 전체 초기화</h3>
+        <button onclick="resetAllData()" style="width:100%; background:#dc2626; color:white; border:none; padding:10px; border-radius:7px; cursor:pointer; font-weight:800;">출석 및 누적 데이터 전부 0으로 초기화</button>
+
         <button onclick="toggleAdminMode()" style="width:100%; margin-top:12px; background:#475569; color:white; border:none; padding:9px; border-radius:7px; cursor:pointer; font-weight:800;">설정 닫기</button>
     </div>
 
@@ -209,7 +214,7 @@
 
 <script>
     // 🌟 구글 Apps Script 웹 앱 URL 입력
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbym4d7r-Su8_vS7SFHGoyDJi_5-mcL-8YdxUkuaZVd_koB_LCpE9Ca6uHk1aDoqjSngtA/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRHaINNCS3_ynS-F6hQi6hDby790lIOllmv7uOfDNSoyNfN2hNMIpev9ncu9IDOc419A/exec";
 
     // 🌟 가나다순으로 정렬된 전체 회원 명단
     const DEFAULT_MEMBERS = [
@@ -248,7 +253,7 @@
     ];
 
     let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v2')) || [...DEFAULT_MEMBERS];
-    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v2')) || [];
+    let globalLogs = [];
 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
 
@@ -404,7 +409,6 @@
         globalLogs.forEach(log => {
             const sNum = Number(log.score);
             if ([10, 5, 99].includes(sNum)) {
-                // 날짜 키 정규화 매칭
                 const cleanLogDate = String(log.date || "").trim();
                 if (!dateStatsMap[cleanLogDate]) {
                     dateStatsMap[cleanLogDate] = { workout: 0, attend: 0, comp: 0, total: 0 };
@@ -489,7 +493,7 @@
         localStorage.setItem('boksakol_sunday_logs_v2', JSON.stringify(globalLogs));
     }
 
-    // 🌟 구글 시트에서 최신 데이터 안전 로드 (실패 시 로컬 데이터 보호)
+    // 🌟 구글 시트에서 최신 데이터를 무조건 우선 로드
     async function loadDataFromSheet() {
         sortMembers();
         if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_SCRIPT_ID")) return;
@@ -497,18 +501,16 @@
             const res = await fetch(GOOGLE_SCRIPT_URL);
             const result = await res.json();
             if (result.status === "success" && Array.isArray(result.logs)) {
-                if (result.logs.length > 0) {
-                    globalLogs = result.logs.map(log => ({
-                        name: String(log.name || "").trim(),
-                        date: String(log.date || "").trim(),
-                        score: Number(log.score),
-                        month: Number(log.month) || 0
-                    })).filter(log => log.name && log.date && [10, 5, 99].includes(log.score));
-                    saveLocally();
-                }
+                globalLogs = result.logs.map(log => ({
+                    name: String(log.name || "").trim(),
+                    date: String(log.date || "").trim(),
+                    score: Number(log.score),
+                    month: Number(log.month) || 0
+                })).filter(log => log.name && log.date && [10, 5, 99].includes(log.score));
+                saveLocally();
             }
         } catch (e) {
-            console.error("구글 시트 데이터 로드 실패 (기존 로컬 데이터 유지):", e);
+            console.error("구글 시트 데이터 로드 실패:", e);
         }
     }
 
@@ -525,6 +527,19 @@
             });
         } catch (e) {
             console.error("구글 시트 데이터 저장 실패:", e);
+        }
+    }
+
+    // 🌟 데이터 전체 초기화 함수 (관리자 패널용)
+    async function resetAllData() {
+        if (confirm("정말로 모든 출석 기록과 누적 점수를 0으로 초기화하시겠습니까? (이 작업은 되돌릴 수 없습니다)")) {
+            globalLogs = [];
+            saveLocally();
+            await saveDataToSheet();
+            alert("모든 데이터가 초기화되었습니다.");
+            renderSundayVerticalList();
+            renderStats();
+            toggleAdminMode();
         }
     }
 
@@ -617,7 +632,6 @@
         const dayAttendance = {};
         globalLogs.forEach(log => {
             const sNum = Number(log.score);
-            // 🌟 날짜 숫자 정밀 매칭 (요일/공백 차이 완벽 극복)
             const logDateClean = String(log.date || "").replace(/[^0-9]/g, '');
             const selectedDateClean = String(selectedDateStr || "").replace(/[^0-9]/g, '');
 
@@ -675,7 +689,6 @@
             const name = String(member.name || "").trim();
             if (!name) return;
 
-            // 검색어 필터링
             if (searchQuery && !name.toLowerCase().includes(searchQuery)) {
                 return;
             }
@@ -784,7 +797,6 @@
             if (!confirm(`[${targetDate.replace(/^\d{4}년\s*/, '')}] [${cleanName}]님을 [${label}]으로 기록하시겠습니까?`)) return;
         }
 
-        // 날짜 숫자 비교를 통해 기존 해당일 기록 제거
         const targetDateClean = String(targetDate).replace(/[^0-9]/g, '');
         globalLogs = globalLogs.filter(log => {
             const logDateClean = String(log.date || "").replace(/[^0-9]/g, '');
@@ -989,7 +1001,6 @@
         });
     }
 
-    // 🌟 앱 실행 시 구글 시트 데이터를 완벽히 로드한 뒤 화면 구성
     async function initApp() {
         initEventBindings();
         initCheckinMonthButtons();
