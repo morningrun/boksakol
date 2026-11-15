@@ -54,9 +54,17 @@
         .swipe-pane { width: 50%; flex-shrink: 0; box-sizing: border-box; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; visibility: hidden; padding: 0 2px; }
         .swipe-pane.active-pane { opacity: 1; pointer-events: auto; visibility: visible; height: auto; }
 
-        .month-filter { display: flex; flex-wrap: wrap; gap: 3.5px; padding-bottom: 2px; margin-bottom: 2px; justify-content: center; }
+        .month-filter { display: flex; flex-wrap: wrap; gap: 3.5px; padding-bottom: 2px; margin-bottom: 8px; justify-content: center; }
         .month-btn { padding: 6px 7.5px; font-size: 0.78rem; border: 1px solid var(--border); border-radius: 7px; background: #ffffff; cursor: pointer; font-weight: 700; color: var(--text-sub); }
         .month-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 6px rgba(37,99,235,0.25); }
+
+        /* 🌟 검색창 및 일일 통계 요약 박스 스타일 */
+        .search-box-container { margin-bottom: 8px; }
+        .search-input { width: 100%; padding: 10px 12px; box-sizing: border-box; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; background: #f8fafc; }
+        .search-input:focus { border-color: var(--accent); background: #ffffff; }
+
+        .daily-summary-box { background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 8px; padding: 9px 12px; margin-bottom: 10px; display: flex; justify-content: space-around; align-items: center; font-size: 0.82rem; font-weight: 800; color: #166534; text-align: center; }
+        .daily-summary-box span { font-weight: 900; color: var(--success); }
 
         .stats-current-date-box { text-align: center; font-size: 0.92rem; font-weight: 800; color: var(--accent); margin-top: 10px; margin-bottom: 10px; letter-spacing: -0.3px; }
 
@@ -129,6 +137,7 @@
 
     <div class="swipe-wrapper" id="swipe-wrapper">
         <div id="swipe-container" class="swipe-container">
+            <!-- 1번 패널: 출석체크 -->
             <div class="swipe-pane active-pane" id="pane-checkin">
                 <div class="month-filter" id="checkin-month-buttons"></div>
                 
@@ -137,9 +146,18 @@
                     <div class="sunday-vertical-group" id="sunday-vertical-wrapper"></div>
                 </div>
 
+                <!-- 🌟 검색창 및 실시간 합산 요약 박스 -->
+                <div class="search-box-container">
+                    <input type="text" id="member-search-input" class="search-input" placeholder="🔍 회원 이름 검색..." oninput="renderCheckinList()">
+                </div>
+                <div class="daily-summary-box" id="daily-summary-box">
+                    참석총인원: <span id="sum-total">0</span>명 | 참석(운동): <span id="sum-workout">0</span>명 | 참석: <span id="sum-attend">0</span>명 | 대회: <span id="sum-comp">0</span>명
+                </div>
+
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
             </div>
 
+            <!-- 2번 패널: 누적현황 -->
             <div class="swipe-pane" id="pane-stats">
                 <div class="month-filter" id="stats-month-buttons"></div>
                 <div class="stats-current-date-box" id="stats-current-date-text">[ 2026년 11월 15일 현재 ]</div>
@@ -148,6 +166,7 @@
         </div>
     </div>
 
+    <!-- 관리자 회원 관리 패널 -->
     <div id="admin-panel" class="admin-panel hidden">
         <h3>🔒 관리자 설정 및 회원 관리</h3>
         
@@ -172,8 +191,7 @@
 </div>
 
 <script>
-    // 🌟 새로 발급받은 구글 앱스 스크립트 웹앱 URL을 입력하세요
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwu7Tgp0v7jjdC9gQ6ElUzzVu0-essBIxxdsfSGm6zMLJTEag__PjnfedXKmxXBJUvXw/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0sseCZgLG0gHpQ-5HuKIzWDEZCUoOI75LCFYoz1foi5m56FKlFfF9rK-sJjHdt0_Phw/exec";
 
     const DEFAULT_MEMBERS = [
         { name: "김창선" }, { name: "방철규" }, { name: "정도영" }, { name: "정범희" }, 
@@ -199,8 +217,8 @@
         { name: "이호병" }, { name: "방지원" }, { name: "황연성" }, { name: "노진규" }
     ];
 
-    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v27')) || [...DEFAULT_MEMBERS];
-    let rawLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v27')) || [];
+    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v28')) || [...DEFAULT_MEMBERS];
+    let rawLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v28')) || [];
     let globalLogs = rawLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
@@ -437,8 +455,8 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_members_v27', JSON.stringify(globalMembers));
-        localStorage.setItem('boksakol_sunday_logs_v27', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_members_v28', JSON.stringify(globalMembers));
+        localStorage.setItem('boksakol_sunday_logs_v28', JSON.stringify(globalLogs));
     }
 
     async function loadDataFromSheet() {
@@ -584,12 +602,31 @@
         }
 
         const dayAttendance = {};
+        let countTotal = 0;
+        let countWorkout = 0;
+        let countAttend = 0;
+        let countComp = 0;
+
         globalLogs.forEach(log => {
             const sNum = Number(log.score);
             if (String(log.date).trim() === String(selectedDateStr).trim() && [10, 5, 99].includes(sNum)) {
                 dayAttendance[String(log.name).trim()] = sNum;
+                countTotal++;
+                if (sNum === 10) countWorkout++;
+                else if (sNum === 5) countAttend++;
+                else if (sNum === 99) countComp++;
             }
         });
+
+        // 🌟 상단 일일 통계 요약 박스 업데이트
+        document.getElementById('sum-total').innerText = countTotal;
+        document.getElementById('sum-workout').innerText = countWorkout;
+        document.getElementById('sum-attend').innerText = countAttend;
+        document.getElementById('sum-comp').innerText = countComp;
+
+        // 🌟 검색어 필터링 적용
+        const searchInput = document.getElementById('member-search-input');
+        const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
         const getGroupOrder = (score) => {
             if (score === 10) return 1;
@@ -598,7 +635,10 @@
             return 4;
         };
 
-        const sortedMembers = [...globalMembers].sort((a, b) => {
+        const sortedMembers = [...globalMembers].filter(member => {
+            if (!keyword) return true;
+            return String(member.name || "").toLowerCase().includes(keyword);
+        }).sort((a, b) => {
             const nameA = String(a.name || "").trim();
             const nameB = String(b.name || "").trim();
             
@@ -613,6 +653,12 @@
             }
             return nameA.localeCompare(nameB, 'ko');
         });
+
+        if (sortedMembers.length === 0) {
+            listDiv.innerHTML = "<div style='text-align:center; padding:25px; color:#94a3b8; font-weight:700;'>검색된 회원이 없습니다.</div>";
+            updateSwipeWrapperHeight();
+            return;
+        }
 
         sortedMembers.forEach((member, index) => {
             const name = String(member.name || "").trim();
@@ -885,7 +931,7 @@
 
         swipeContainer.addEventListener('touchend', (e) => {
             if (!isSwiping) return;
-            isSwiping = false;
+            isSwisPreviewing = false;
 
             let endX = e.changedTouches[0].clientX;
             let diff = startX - endX;
@@ -908,7 +954,6 @@
         renderSundayVerticalList();
         renderStats();
         
-        // 🌟 앱 실행 시 구글 시트에서 최신 데이터를 먼저 불러옴
         await loadDataFromSheet();
         renderSundayVerticalList();
         renderStats();
