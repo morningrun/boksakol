@@ -9,6 +9,7 @@
     <link rel="icon" sizes="192x192" href="todal_attendance_og.jpg">
     <link rel="icon" href="todal_attendance_og.jpg" type="image/jpeg">
 
+    <meta property="property" content="website">
     <meta property="og:title" content="복사골마라톤클럽 일요운동 출석부">
     <meta property="og:description" content="일요일 달리기 모임 출석 및 누적현황 관리 시스템">
     <meta property="og:image" content="https://morningrun.github.io/boksakol/todal_attendance_og.jpg">
@@ -24,9 +25,9 @@
         :root {
             --primary: #0f172a;
             --accent: #2563eb;
-            --success: #059669;
-            --info: #0284c7;
-            --warning: #d97706;
+            --success: #059669;    /* 참석(운동) (10점) - 녹색 */
+            --info: #0284c7;        /* 참석 (5점) - 파란색 */
+            --warning: #d97706;    /* 대회 (10점) - 주황색 */
             --danger: #dc2626;
             --bg-color: #f1f5f9;
             --card-bg: #ffffff;
@@ -112,7 +113,6 @@
 
         .hidden { display: none !important; }
         .loading { text-align: center; color: var(--text-sub); padding: 25px; font-weight: 700; }
-        .sync-status { text-align: center; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 8px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -120,7 +120,6 @@
 <div class="container">
     <div class="main-title-box">
         <div class="main-title">🏃‍♂️ 복사골 일요운동 출석부</div>
-        <div class="sync-status" id="sync-status-text">☁️ 구글 시트 연결 대기 중...</div>
     </div>
     
     <div class="tab-group">
@@ -128,8 +127,10 @@
         <button class="tab-btn" id="tab-stats-btn">🏆 <span id="current-year-text">2026</span>년 누적현황</button>
     </div>
 
+    <!-- 좌우 스와이프 영역 -->
     <div class="swipe-wrapper" id="swipe-wrapper">
         <div id="swipe-container" class="swipe-container">
+            <!-- 1번 패널: 출석체크 -->
             <div class="swipe-pane active-pane" id="pane-checkin">
                 <div class="month-filter" id="checkin-month-buttons"></div>
                 
@@ -141,14 +142,16 @@
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
             </div>
 
+            <!-- 2번 패널: 누적현황 -->
             <div class="swipe-pane" id="pane-stats">
                 <div class="month-filter" id="stats-month-buttons"></div>
-                <div class="stats-current-date-box" id="stats-current-date-text">[ 2026년 11월 기준 ]</div>
+                <div class="stats-current-date-box" id="stats-current-date-text">[ 2026년 11월 15일 현재 ]</div>
                 <div id="stats-list" class="loading">누적 데이터 계산 중...</div>
             </div>
         </div>
     </div>
 
+    <!-- 관리자 회원 관리 패널 -->
     <div id="admin-panel" class="admin-panel hidden">
         <h3>🔒 관리자 설정 및 회원 관리</h3>
         
@@ -167,15 +170,17 @@
         <button onclick="toggleAdminMode()" style="width:100%; margin-top:12px; background:#475569; color:white; border:none; padding:9px; border-radius:7px; cursor:pointer; font-weight:800;">설정 닫기</button>
     </div>
 
+    <!-- 우측 하단 구석 톱니바퀴 기호 버튼 -->
     <div class="footer-setting-box">
         <button class="admin-gear-icon-btn" id="admin-open-btn" title="관리자 설정">⚙️</button>
     </div>
 </div>
 
 <script>
+    // 복사골 전용 구글 앱스 스크립트 웹앱 URL 입력 (기존 사용 중인 주소 유지)
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5LCgsoXIwCtNvJp9XhweR-bh1sDhysCsrUsiI-pk9SsBvxG_0oSXpy5wXWAP1fbrshQ/exec";
 
-    // 🌟 84명 전체 원본 명단 고정
+    // 84명 전체 원본 명단 고정
     const DEFAULT_MEMBERS = [
         { name: "김창선" }, { name: "방철규" }, { name: "정도영" }, { name: "정범희" }, 
         { name: "조한복" }, { name: "지덕수" }, { name: "필동만" }, { name: "이석형" }, 
@@ -200,12 +205,40 @@
         { name: "이호병" }, { name: "방지원" }, { name: "황연성" }, { name: "노진규" }
     ];
 
-    let globalMembers = [...DEFAULT_MEMBERS];
-    let globalLogs = []; 
+    let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v25')) || [...DEFAULT_MEMBERS];
+    
+    let rawLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v25')) || [];
+    let globalLogs = rawLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
+
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
+
+    let selectedDateStr = localStorage.getItem('boksakol_sunday_selected_date') || "";
+    let checkinSelectedMonth = localStorage.getItem('boksakol_sunday_selected_month') || (String(new Date().getMonth() + 1) + "월");
+    let statsSelectedMonth = "전체";
+    let activePaneIndex = 0;
 
     const currentYear = new Date().getFullYear();
     document.getElementById('current-year-text').innerText = currentYear;
+
+    function updateSwipeWrapperHeight() {
+        const calculate = () => {
+            const wrapper = document.getElementById('swipe-wrapper');
+            const panes = [
+                document.getElementById('pane-checkin'),
+                document.getElementById('pane-stats')
+            ];
+            if (wrapper && panes[activePaneIndex]) {
+                const targetPane = panes[activePaneIndex];
+                const targetHeight = targetPane.scrollHeight;
+                if (targetHeight > 0) {
+                    wrapper.style.height = (targetHeight + 20) + 'px';
+                }
+            }
+        };
+        requestAnimationFrame(calculate);
+        setTimeout(calculate, 50);
+        setTimeout(calculate, 200);
+    }
 
     function formatDateToString(dateObj) {
         const years = dateObj.getFullYear();
@@ -227,60 +260,6 @@
     }
 
     const allSundays = getAllSundaysOfCurrentYear();
-
-    let checkinSelectedMonth = localStorage.getItem('boksakol_sunday_selected_month');
-    if (!checkinSelectedMonth) {
-        checkinSelectedMonth = (new Date().getMonth() + 1) + "월";
-        localStorage.setItem('boksakol_sunday_selected_month', checkinSelectedMonth);
-    }
-
-    let selectedDateStr = localStorage.getItem('boksakol_sunday_selected_date');
-    if (!selectedDateStr) {
-        const filteredInit = allSundays.filter(dStr => {
-            const mMatch = dStr.match(/(\d+)월/);
-            return mMatch && (mMatch[1] + "월") === checkinSelectedMonth;
-        });
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const validInit = filteredInit.filter(dStr => {
-            const tDate = new Date(dStr.replace(/년|월/g, '-').replace(/일.*/, '').trim());
-            tDate.setHours(0, 0, 0, 0);
-            return tDate <= today;
-        });
-        selectedDateStr = validInit.length > 0 ? validInit[validInit.length - 1] : (filteredInit[0] || allSundays[0]);
-        localStorage.setItem('boksakol_sunday_selected_date', selectedDateStr);
-    }
-
-    let statsSelectedMonth = "전체";
-    let activePaneIndex = 0;
-
-    function updateSyncStatus(msg, isError = false) {
-        const statusEl = document.getElementById('sync-status-text');
-        if (statusEl) {
-            statusEl.innerText = msg;
-            statusEl.style.color = isError ? '#dc2626' : '#059669';
-        }
-    }
-
-    function updateSwipeWrapperHeight() {
-        const calculate = () => {
-            const wrapper = document.getElementById('swipe-wrapper');
-            const panes = [
-                document.getElementById('pane-checkin'),
-                document.getElementById('pane-stats')
-            ];
-            if (wrapper && panes[activePaneIndex]) {
-                const targetPane = panes[activePaneIndex];
-                const targetHeight = targetPane.scrollHeight;
-                if (targetHeight > 0) {
-                    wrapper.style.height = (targetHeight + 20) + 'px';
-                }
-            }
-        };
-        requestAnimationFrame(calculate);
-        setTimeout(calculate, 50);
-        setTimeout(calculate, 200);
-    }
 
     function initCheckinMonthButtons() {
         const wrapper = document.getElementById('checkin-month-buttons');
@@ -370,14 +349,15 @@
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        if (!filteredSundays.includes(selectedDateStr)) {
-            const validSundays = filteredSundays.filter(dStr => {
-                const tDate = new Date(dStr.replace(/년|월/g, '-').replace(/일.*/, '').trim());
-                tDate.setHours(0, 0, 0, 0);
-                return tDate <= today;
-            });
-            selectedDateStr = validSundays.length > 0 ? validSundays[validSundays.length - 1] : filteredSundays[0];
-            localStorage.setItem('boksakol_sunday_selected_date', selectedDateStr);
+        const validSundays = filteredSundays.filter(dStr => {
+            const tDate = new Date(dStr.replace(/년|월/g, '-').replace(/일.*/, '').trim());
+            tDate.setHours(0, 0, 0, 0);
+            return tDate <= today;
+        });
+
+        let defaultDate = validSundays.length > 0 ? validSundays[validSundays.length - 1] : filteredSundays[0];
+        if (!selectedDateStr || !filteredSundays.includes(selectedDateStr)) {
+            selectedDateStr = defaultDate;
         }
 
         const dateStatsMap = {};
@@ -404,6 +384,7 @@
             const isFuture = targetDate > today;
             const isSelected = (dStr === selectedDateStr);
             const dateStat = dateStatsMap[dStr] || { workout: 0, attend: 0, comp: 0, total: 0 };
+
             const displayDateText = dStr.replace(/^\d{4}년\s*/, '');
 
             if (isFuture) {
@@ -463,62 +444,64 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_logs_v4', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_members_v25', JSON.stringify(globalMembers));
+        localStorage.setItem('boksakol_sunday_logs_v25', JSON.stringify(globalLogs));
     }
 
     async function loadDataFromSheet() {
-        if (GOOGLE_SCRIPT_URL.includes("여기에")) {
-            updateSyncStatus("⚠️ Apps Script URL 미설정 (오프라인 모드)");
-            const localSaved = localStorage.getItem('boksakol_sunday_logs_v4');
-            if (localSaved) {
-                try { globalLogs = JSON.parse(localSaved); } catch(e) {}
-            }
-            return;
-        }
         try {
-            updateSyncStatus("🔄 구글 시트 동기화 중...");
-            const response = await fetch(GOOGLE_SCRIPT_URL);
-            const result = await response.json();
-            if (result && result.status === "success") {
-                globalMembers = [...DEFAULT_MEMBERS];
-                if (result.logs && Array.isArray(result.logs)) {
-                    // 🌟 구글 시트의 최신 로그를 절대적으로 우선 반영
-                    globalLogs = result.logs.filter(l => [10, 5, 99].includes(Number(l.score)));
-                } else {
-                    globalLogs = [];
+            const res = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: "getData" })
+            });
+            const resData = await res.json();
+            if (resData.status === "success") {
+                if (resData.members && Array.isArray(resData.members) && resData.members.length > 0) {
+                    globalMembers = resData.members;
+                }
+                if (resData.logs && Array.isArray(resData.logs)) {
+                    const uniqueMap = new Map();
+                    resData.logs.forEach(l => {
+                        const sNum = Number(l.score);
+                        if (l.name && l.date && [10, 5, 99].includes(sNum)) {
+                            const key = String(l.date).trim() + "_" + String(l.name).trim();
+                            uniqueMap.set(key, { name: String(l.name).trim(), date: String(l.date).trim(), score: sNum, month: l.month });
+                        }
+                    });
+                    globalLogs = Array.from(uniqueMap.values());
                 }
                 saveLocally();
-                updateSyncStatus("✅ 구글 시트 동기화 완료");
             }
-        } catch (error) {
-            console.error("구글 시트 로드 실패:", error);
-            updateSyncStatus("⚠️ 오프라인 (로컬 데이터 사용 중)", true);
-            const localSaved = localStorage.getItem('boksakol_sunday_logs_v4');
-            if (localSaved) {
-                try { globalLogs = JSON.parse(localSaved); } catch(e) {}
-            }
+        } catch (e) {
+            console.error("구글 시트 로드 실패, 로컬 데이터 유지");
         }
         sortMembers();
     }
 
     async function saveDataToSheet() {
+        sortMembers();
+        const uniqueMap = new Map();
+        globalLogs.forEach(l => {
+            const sNum = Number(l.score);
+            if (l.name && l.date && [10, 5, 99].includes(sNum)) {
+                const key = String(l.date).trim() + "_" + String(l.name).trim();
+                uniqueMap.set(key, { name: String(l.name).trim(), date: String(l.date).trim(), score: sNum, month: l.month });
+            }
+        });
+        globalLogs = Array.from(uniqueMap.values());
         saveLocally();
-        if (GOOGLE_SCRIPT_URL.includes("여기에")) return;
+
         try {
-            updateSyncStatus("💾 구글 시트 저장 중...");
             await fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
+                method: 'POST',
                 body: JSON.stringify({
+                    action: "saveData",
                     members: globalMembers,
                     logs: globalLogs
                 })
             });
-            updateSyncStatus("✅ 구글 시트 저장 완료");
-        } catch (error) {
-            console.error("구글 시트 저장 실패:", error);
-            updateSyncStatus("❌ 저장 실패 (네트워크 확인)", true);
+        } catch (e) {
+            console.error("구글 시트 저장 실패");
         }
     }
 
@@ -542,7 +525,10 @@
     function changePassword() {
         const input = document.getElementById('new-admin-password');
         const newPwd = input.value.trim();
-        if (!newPwd) { alert("새 비밀번호를 입력해주세요."); return; }
+        if (!newPwd) {
+            alert("새 비밀번호를 입력해주세요.");
+            return;
+        }
         if (confirm("관리자 비밀번호를 정말 변경하시겠습니까?")) {
             adminPassword = newPwd;
             localStorage.setItem('boksakol_sunday_admin_pwd', newPwd);
@@ -629,7 +615,9 @@
             const groupA = getGroupOrder(scoreA);
             const groupB = getGroupOrder(scoreB);
 
-            if (groupA !== groupB) return groupA - groupB;
+            if (groupA !== groupB) {
+                return groupA - groupB;
+            }
             return nameA.localeCompare(nameB, 'ko');
         });
 
@@ -758,26 +746,19 @@
         
         const now = new Date();
         const y = now.getFullYear();
+        const m = now.getMonth() + 1;
+        const d = now.getDate();
         
-        const getLatestSundayDateStr = (year, monthNum) => {
-            let targetDate = new Date(year, monthNum, 0);
-            while (targetDate.getDay() !== 0) targetDate.setDate(targetDate.getDate() - 1);
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            if (targetDate > today && monthNum === (today.getMonth() + 1)) {
-                targetDate = new Date(today);
-                while (targetDate.getDay() !== 0) targetDate.setDate(targetDate.getDate() - 1);
-            }
-            return `${targetDate.getFullYear()}년 ${targetDate.getMonth() + 1}월 ${targetDate.getDate()}일 기준`;
-        };
-
         if (statsSelectedMonth === "전체") {
-            let latestSun = new Date(now);
-            while (latestSun.getDay() !== 0) latestSun.setDate(latestSun.getDate() - 1);
-            dateTextDiv.innerText = `[ ${latestSun.getFullYear()}년 ${latestSun.getMonth() + 1}월 ${latestSun.getDate()}일 기준 ]`;
+            dateTextDiv.innerText = `[ ${y}년 ${m}월 ${d}일 현재 ]`;
         } else {
             const mNum = parseInt(statsSelectedMonth.replace(/[^0-9]/g, ""), 10);
-            dateTextDiv.innerText = `[ ${getLatestSundayDateStr(y, mNum)} ]`;
+            if (mNum === m) {
+                dateTextDiv.innerText = `[ ${y}년 ${m}월 ${d}일 현재 ]`;
+            } else {
+                const lastDay = new Date(y, mNum, 0).getDate();
+                dateTextDiv.innerText = `[ ${y}년 ${mNum}월 ${lastDay}일 기준 ]`;
+            }
         }
 
         if (!statsDiv) return;
@@ -883,23 +864,45 @@
         document.getElementById('tab-stats-btn').onclick = () => switchTab(1);
         document.getElementById('admin-open-btn').onclick = toggleAdminMode;
 
-        window.addEventListener('resize', () => updateSwipeWrapperHeight());
+        window.addEventListener('resize', () => {
+            updateSwipeWrapperHeight();
+        });
 
         const swipeContainer = document.getElementById('swipe-container');
-        let startX = 0, isSwiping = false;
+        let startX = 0;
+        let startY = 0;
+        let isSwiping = false;
 
         swipeContainer.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
             isSwiping = true;
+        }, { passive: true });
+
+        swipeContainer.addEventListener('touchmove', (e) => {
+            if (!isSwiping) return;
+            let currentX = e.touches[0].clientX;
+            let currentY = e.touches[0].clientY;
+            let diffX = Math.abs(currentX - startX);
+            let diffY = Math.abs(currentY - startY);
+            if (diffX > diffY) {
+                // 가로 스와이프 시 기본 스크롤 간섭 방지
+            }
         }, { passive: true });
 
         swipeContainer.addEventListener('touchend', (e) => {
             if (!isSwiping) return;
             isSwiping = false;
-            let diff = startX - e.changedTouches[0].clientX;
+
+            let endX = e.changedTouches[0].clientX;
+            let diff = startX - endX;
+
             if (Math.abs(diff) > 40) {
-                if (diff > 0 && activePaneIndex < 1) switchTab(activePaneIndex + 1);
-                else if (diff < 0 && activePaneIndex > 0) switchTab(activePaneIndex - 1);
+                if (diff > 0 && activePaneIndex < 1) {
+                    switchTab(activePaneIndex + 1);
+                } else if (diff < 0 && activePaneIndex > 0) {
+                    switchTab(activePaneIndex - 1);
+                }
             }
         });
     }
@@ -909,10 +912,10 @@
         initCheckinMonthButtons();
         initStatsMonthButtons();
         sortMembers();
+        renderSundayVerticalList();
+        renderStats();
         
-        // 🌟 앱 실행 시 구글 시트 데이터를 최우선으로 불러와서 반영
         await loadDataFromSheet();
-        
         renderSundayVerticalList();
         renderStats();
     }
