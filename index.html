@@ -173,7 +173,7 @@
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMz2upwPlTU7wCY7WmfpQPv2n-2lRDgjBzIM5sjCpSyGVjrBfzEl2p6JZSTFBuVIlE2w/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5LCgsoXIwCtNvJp9XhweR-bh1sDhysCsrUsiI-pk9SsBvxG_0oSXpy5wXWAP1fbrshQ/exec";
 
     // 🌟 84명 전체 원본 명단 고정
     const DEFAULT_MEMBERS = [
@@ -201,7 +201,7 @@
     ];
 
     let globalMembers = [...DEFAULT_MEMBERS];
-    let globalLogs = []; // 최초 빈 배열로 시작하여 시트 데이터를 최우선 로드
+    let globalLogs = []; 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
 
     const currentYear = new Date().getFullYear();
@@ -463,14 +463,13 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_logs_v3', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_logs_v4', JSON.stringify(globalLogs));
     }
 
     async function loadDataFromSheet() {
         if (GOOGLE_SCRIPT_URL.includes("여기에")) {
-            updateSyncStatus("⚠️ Apps Script URL 미설정 (로컬 저장소 모드)");
-            // URL이 없을 때만 기존 로컬 데이터를 백업용으로 불러옴
-            const localSaved = localStorage.getItem('boksakol_sunday_logs_v3');
+            updateSyncStatus("⚠️ Apps Script URL 미설정 (오프라인 모드)");
+            const localSaved = localStorage.getItem('boksakol_sunday_logs_v4');
             if (localSaved) {
                 try { globalLogs = JSON.parse(localSaved); } catch(e) {}
             }
@@ -494,7 +493,7 @@
         } catch (error) {
             console.error("구글 시트 로드 실패:", error);
             updateSyncStatus("⚠️ 오프라인 (로컬 데이터 사용 중)", true);
-            const localSaved = localStorage.getItem('boksakol_sunday_logs_v3');
+            const localSaved = localStorage.getItem('boksakol_sunday_logs_v4');
             if (localSaved) {
                 try { globalLogs = JSON.parse(localSaved); } catch(e) {}
             }
@@ -843,7 +842,6 @@
                 const mNum = parseInt(statsSelectedMonth.replace(/[^0-9]/g, ""), 10);
                 if (data.monthly[mNum]) {
                     targetScore = data.monthly[mNum].score;
-                    targetWorkout = data.monthly[mNum].monthly ? 0 : data.monthly[mNum].workout; // safety
                     targetWorkout = data.monthly[mNum].workout;
                     targetAttend = data.monthly[mNum].attend;
                     targetComp = data.monthly[mNum].comp;
@@ -912,7 +910,7 @@
         initStatsMonthButtons();
         sortMembers();
         
-        // 🌟 앱 실행 시 구글 시트 데이터를 먼저 불러온 뒤 화면을 그림
+        // 🌟 앱 실행 시 구글 시트 데이터를 최우선으로 불러와서 반영
         await loadDataFromSheet();
         
         renderSundayVerticalList();
