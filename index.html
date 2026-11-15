@@ -175,7 +175,7 @@
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMz2upwPlTU7wCY7WmfpQPv2n-2lRDgjBzIM5sjCpSyGVjrBfzEl2p6JZSTFBuVIlE2w/exec";
 
-    // 🌟 84명 전체 원본 명단 완벽 반영 (제공해주신 순서 및 이름 그대로)
+    // 🌟 84명 전체 원본 명단 고정
     const DEFAULT_MEMBERS = [
         { name: "김창선" }, { name: "방철규" }, { name: "정도영" }, { name: "정범희" }, 
         { name: "조한복" }, { name: "지덕수" }, { name: "필동만" }, { name: "이석형" }, 
@@ -201,7 +201,7 @@
     ];
 
     let globalMembers = [...DEFAULT_MEMBERS];
-    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v2')) || [];
+    let globalLogs = []; // 최초 빈 배열로 시작하여 시트 데이터를 최우선 로드
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
 
     const currentYear = new Date().getFullYear();
@@ -463,12 +463,17 @@
     function saveLocally() {
         sortMembers();
         globalLogs = globalLogs.filter(l => [10, 5, 99].includes(Number(l.score)));
-        localStorage.setItem('boksakol_sunday_logs_v2', JSON.stringify(globalLogs));
+        localStorage.setItem('boksakol_sunday_logs_v3', JSON.stringify(globalLogs));
     }
 
     async function loadDataFromSheet() {
         if (GOOGLE_SCRIPT_URL.includes("여기에")) {
-            updateSyncStatus("⚠️ Apps Script URL 미설정 (오프라인 모드)");
+            updateSyncStatus("⚠️ Apps Script URL 미설정 (로컬 저장소 모드)");
+            // URL이 없을 때만 기존 로컬 데이터를 백업용으로 불러옴
+            const localSaved = localStorage.getItem('boksakol_sunday_logs_v3');
+            if (localSaved) {
+                try { globalLogs = JSON.parse(localSaved); } catch(e) {}
+            }
             return;
         }
         try {
@@ -477,15 +482,22 @@
             const result = await response.json();
             if (result && result.status === "success") {
                 globalMembers = [...DEFAULT_MEMBERS];
-                if (result.logs) {
-                    globalLogs = result.logs;
+                if (result.logs && Array.isArray(result.logs)) {
+                    // 🌟 구글 시트의 최신 로그를 절대적으로 우선 반영
+                    globalLogs = result.logs.filter(l => [10, 5, 99].includes(Number(l.score)));
+                } else {
+                    globalLogs = [];
                 }
                 saveLocally();
                 updateSyncStatus("✅ 구글 시트 동기화 완료");
             }
         } catch (error) {
             console.error("구글 시트 로드 실패:", error);
-            updateSyncStatus("⚠️ 오프라인 모드로 동작 중", true);
+            updateSyncStatus("⚠️ 오프라인 (로컬 데이터 사용 중)", true);
+            const localSaved = localStorage.getItem('boksakol_sunday_logs_v3');
+            if (localSaved) {
+                try { globalLogs = JSON.parse(localSaved); } catch(e) {}
+            }
         }
         sortMembers();
     }
@@ -494,7 +506,7 @@
         saveLocally();
         if (GOOGLE_SCRIPT_URL.includes("여기에")) return;
         try {
-            updateSyncStatus("💾 저장 중...");
+            updateSyncStatus("💾 구글 시트 저장 중...");
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -831,6 +843,7 @@
                 const mNum = parseInt(statsSelectedMonth.replace(/[^0-9]/g, ""), 10);
                 if (data.monthly[mNum]) {
                     targetScore = data.monthly[mNum].score;
+                    targetWorkout = data.monthly[mNum].monthly ? 0 : data.monthly[mNum].workout; // safety
                     targetWorkout = data.monthly[mNum].workout;
                     targetAttend = data.monthly[mNum].attend;
                     targetComp = data.monthly[mNum].comp;
@@ -899,10 +912,9 @@
         initStatsMonthButtons();
         sortMembers();
         
-        renderSundayVerticalList();
-        renderStats();
-        
+        // 🌟 앱 실행 시 구글 시트 데이터를 먼저 불러온 뒤 화면을 그림
         await loadDataFromSheet();
+        
         renderSundayVerticalList();
         renderStats();
     }
