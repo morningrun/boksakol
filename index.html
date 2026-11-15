@@ -3,34 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Kakao Talk Open Graph Meta Tags -->
-    <meta property="og:title" content="2026년 복사골마라톤클럽 일요운동 출석현황">
-    <meta property="og:description" content="복사골마라톤클럽 일요운동 출석체크 및 누적 현황 페이지입니다.">
-    <meta property="og:image" content="https://morningrun.github.io/boksakol/todal_attendance_og.jpg">
-    <meta property="og:url" content="https://morningrun.github.io/boksakol/">
-
-    <title>2026년 복사골마라톤클럽 일요운동 출석현황</title>
+    <title>복사골마라톤클럽 일요운동 출석부</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
-        body { font-family: 'Pretendard', sans-serif; }
+        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen pb-20">
+<body class="bg-slate-100 min-h-screen flex justify-center items-start py-0 sm:py-6">
 
-    <div class="max-w-md mx-auto bg-white min-h-screen shadow-lg flex flex-col relative">
+    <div class="w-full max-w-md bg-white min-h-screen sm:min-h-[85vh] sm:rounded-2xl shadow-xl flex flex-col relative overflow-hidden">
         
         <!-- Header -->
-        <header class="bg-blue-900 text-white p-5 sticky top-0 z-10 shadow-md">
+        <header class="bg-gradient-to-r from-slate-900 to-blue-950 text-white p-5 sticky top-0 z-20 shadow-md">
             <div class="flex justify-between items-center">
                 <div>
-                    <h1 id="header-title" class="text-xl font-bold">2026년 11월 일요운동 출석현황</h1>
-                    <p class="text-xs text-blue-200 mt-1">복사골마라톤클럽 일요일 정기운동 출석부</p>
+                    <h1 id="header-title" class="text-lg font-bold tracking-tight">2026년 11월 복사골 일요운동 출석현황</h1>
+                    <p class="text-xs text-slate-300 mt-0.5">복사골마라톤클럽 일요일 정기운동 출석부</p>
                 </div>
                 <div class="text-right">
-                    <span id="current-date-str" class="text-xs bg-blue-800 px-2.5 py-1 rounded-full font-medium"></span>
+                    <span id="current-date-str" class="text-[11px] bg-blue-600/50 text-blue-100 px-2.5 py-1 rounded-full font-medium">11월 15일 기준</span>
                 </div>
             </div>
         </header>
@@ -39,55 +32,51 @@
         <main class="p-4 flex-1 pb-24">
             
             <!-- Month Filter -->
-            <div class="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
-                <button onclick="changeMonth('11')" id="btn-m11" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-blue-600 text-white shadow-sm">11월</button>
-                <button onclick="changeMonth('12')" id="btn-m12" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-slate-100 text-slate-600 hover:bg-slate-200">12월</button>
-                <button onclick="changeMonth('all')" id="btn-mall" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-slate-100 text-slate-600 hover:bg-slate-200">전체누적</button>
+            <div class="flex gap-2 pb-2 mb-4">
+                <button onclick="changeMonth('11')" id="btn-m11" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-blue-600 text-white shadow-sm">11월</button>
+                <button onclick="changeMonth('12')" id="btn-m12" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">12월</button>
+                <button onclick="changeMonth('all')" id="btn-mall" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">전체누적</button>
             </div>
 
             <!-- Cumulative Status Section -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-6">
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 mb-5">
                 <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                    <h2 class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                         <i class="fa-solid fa-ranking-star text-blue-600"></i> 누적 출석 현황
                     </h2>
-                    <span id="cumulative-date-text" class="text-[11px] text-slate-400 font-medium"></span>
+                    <span id="cumulative-date-text" class="text-[11px] text-slate-400 font-medium">11.01 ~ 11.15 기준</span>
                 </div>
-                <div id="stats-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                <div id="stats-list" class="space-y-2 max-h-56 overflow-y-auto pr-1">
                     <!-- Dynamic Stats -->
                 </div>
             </div>
 
             <!-- Attendance Check Section -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-                <h2 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4">
+                <h2 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                     <i class="fa-solid fa-calendar-check text-blue-600"></i> 일요운동 출석 체크
                 </h2>
                 
                 <!-- Date Selector -->
-                <div class="mb-4">
-                    <label class="block text-xs font-medium text-slate-500 mb-1">운동 날짜 선택 (일요일)</label>
-                    <select id="attendance-date" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <div class="mb-3">
+                    <select id="attendance-date" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <!-- Dynamically filled Sundays -->
                     </select>
                 </div>
 
                 <!-- Member Check Grid -->
-                <div class="mb-3">
-                    <span class="text-xs font-medium text-slate-500">참석자 체크 (터치하여 선택)</span>
-                </div>
-                <div id="member-grid" class="grid grid-cols-2 gap-2">
+                <div id="member-grid" class="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto pr-1">
                     <!-- Dynamically filled members -->
                 </div>
 
-                <button onclick="submitAttendance()" class="w-full mt-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors shadow-md flex items-center justify-center gap-2">
+                <button onclick="submitAttendance()" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-xs transition-colors shadow-md flex items-center justify-center gap-2">
                     <i class="fa-solid fa-check"></i> 출석체크 저장
                 </button>
             </div>
         </main>
 
         <!-- Admin Panel Toggle Button (Bottom-Right Floating Icon) -->
-        <button onclick="toggleAdminPanel()" class="fixed bottom-5 right-5 w-12 h-12 bg-slate-800 hover:bg-slate-900 text-white rounded-full shadow-lg flex items-center justify-center text-lg z-30 transition-transform active:scale-95" title="관리자 설정">
+        <button onclick="toggleAdminPanel()" class="fixed bottom-5 right-5 w-12 h-12 bg-slate-900 hover:bg-black text-white rounded-full shadow-lg flex items-center justify-center text-base z-30 transition-transform active:scale-95" title="관리자 설정">
             <i class="fa-solid fa-gear"></i>
         </button>
 
@@ -95,11 +84,11 @@
         <div id="admin-panel" class="hidden fixed inset-0 bg-black/50 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
             <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 max-h-[85vh] overflow-y-auto shadow-2xl">
                 <div class="flex justify-between items-center mb-4 border-b pb-3">
-                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-lock text-blue-600"></i> 관리자 패널
                     </h3>
                     <button onclick="toggleAdminPanel()" class="text-slate-400 hover:text-slate-600 p-1">
-                        <i class="fa-solid fa-xmark text-xl"></i>
+                        <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
 
@@ -107,10 +96,10 @@
                 <div class="mb-5">
                     <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">클럽 멤버 관리</h4>
                     <div class="flex gap-2 mb-2">
-                        <input type="text" id="new-member-name" placeholder="추가할 멤버 이름" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button onclick="addMember()" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-900 transition-colors">추가</button>
+                        <input type="text" id="new-member-name" placeholder="추가할 멤버 이름" class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="addMember()" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-black transition-colors">추가</button>
                     </div>
-                    <div id="admin-member-list" class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-slate-50 rounded-lg border border-slate-200">
+                    <div id="admin-member-list" class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200">
                         <!-- Admin Member Tags -->
                     </div>
                 </div>
@@ -128,7 +117,7 @@
     </div>
 
     <script>
-        // 전체 복사골마라톤클럽 멤버 리스트 (누락 없이 통합 복구)
+        // 전체 복사골마라톤클럽 멤버 리스트 (대회 신청 명단 및 기존 명단 전체 통합 복구)
         let members = [
             "곽병우", "김경기", "김미향", "김은성", "김장곤", "김정구", "김정균", "김진철", 
             "김태수", "노진규", "노현종", "단우진", "박광남", "박정호", "박정후", "박지혜", 
@@ -141,9 +130,8 @@
 
         let logs = []; // [ {name, date, score, month}, ... ]
         let selectedMonth = '11';
-        let clickedStates = {}; // member -> { date: score }
+        let clickedStates = {}; // member -> score
 
-        // 초기 실행
         window.onload = function() {
             initSundays();
             loadData();
@@ -153,7 +141,6 @@
             const select = document.getElementById('attendance-date');
             select.innerHTML = '';
             
-            // 2026년 11월 및 12월의 일요일 날짜 자동 생성
             const sundays = [
                 { label: "2026년 11월 1일 일요일", val: "2026년 11월 1일 일요일", month: "11" },
                 { label: "2026년 11월 8일 일요일", val: "2026년 11월 8일 일요일", month: "11" },
@@ -174,33 +161,26 @@
                 select.appendChild(opt);
             });
 
-            // 오늘 날짜와 가장 가까운 일요일 자동 선택 (기본: 오늘 혹은 가장 최근 일요일)
             select.value = "2026년 11월 15일 일요일";
-            document.getElementById('current-date-str').textContent = "11월 15일 기준";
-            document.getElementById('cumulative-date-text').textContent = "11.01 ~ 11.15 기준";
-
             select.addEventListener('change', updateMemberGridStates);
         }
 
         function changeMonth(m) {
             selectedMonth = m;
-            document.getElementById('btn-m11').className = m === '11' ? "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-blue-600 text-white shadow-sm" : "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-slate-100 text-slate-600 hover:bg-slate-200";
-            document.getElementById('btn-m12').className = m === '12' ? "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-blue-600 text-white shadow-sm" : "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-slate-100 text-slate-600 hover:bg-slate-200";
-            document.getElementById('btn-mall').className = m === 'all' ? "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-blue-600 text-white shadow-sm" : "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-slate-100 text-slate-600 hover:bg-slate-200";
+            document.getElementById('btn-m11').className = m === '11' ? "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-blue-600 text-white shadow-sm" : "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200";
+            document.getElementById('btn-m12').className = m === '12' ? "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-blue-600 text-white shadow-sm" : "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200";
+            document.getElementById('btn-mall').className = m === 'all' ? "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-blue-600 text-white shadow-sm" : "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200";
 
-            const titleMap = { '11': '2026년 11월 일요운동 출석현황', '12': '2026년 12월 일요운동 출석현황', 'all': '복사골마라톤클럽 일요운동 전체 누적현황' };
+            const titleMap = { '11': '2026년 11월 복사골 일요운동 출석현황', '12': '2026년 12월 복사골 일요운동 출석현황', 'all': '복사골마라톤클럽 일요운동 전체 누적현황' };
             document.getElementById('header-title').textContent = titleMap[m];
             
             renderStats();
         }
 
-        // 서버 연동 시뮬레이션 및 API 연동부 (Google Apps Script 연동용)
         function loadData() {
-            // 구글 시트 백엔드 연동 부분 (google.script.run 연동)
             if (typeof google !== 'undefined' && google.script && google.script.run) {
                 google.script.run.withSuccessHandler(onDataLoaded).getData();
             } else {
-                // 테스트용 로컬 데이터
                 renderMemberGrid();
                 renderStats();
             }
@@ -219,14 +199,12 @@
             
             const selectedDate = document.getElementById('attendance-date').value;
             
-            // 현재 선택된 날짜에 이미 체크된 항목 반영
             const currentDayLogs = logs.filter(l => l.date === selectedDate);
             clickedStates = {};
             currentDayLogs.forEach(l => {
                 clickedStates[l.name] = l.score;
             });
 
-            // 클릭된 멤버를 상단으로 정렬
             let sortedMembers = [...members].sort((a, b) => {
                 let aChecked = clickedStates[a] ? 1 : 0;
                 let bChecked = clickedStates[b] ? 1 : 0;
@@ -238,25 +216,25 @@
                 let isChecked = score > 0;
 
                 let card = document.createElement('div');
-                card.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${isChecked ? 'bg-blue-50 border-blue-300 shadow-sm' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
+                card.className = `p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${isChecked ? 'bg-blue-50/80 border-blue-300 shadow-sm' : 'bg-slate-50/50 border-slate-200 hover:bg-slate-50'}`;
                 card.onclick = () => toggleMember(name);
 
                 let leftDiv = document.createElement('div');
-                leftDiv.className = "flex items-center gap-2.5";
+                leftDiv.className = "flex items-center gap-2";
                 
                 let iconBox = document.createElement('div');
-                iconBox.className = `w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${isChecked ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`;
+                iconBox.className = `w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${isChecked ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'}`;
                 iconBox.innerHTML = isChecked ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-user"></i>';
                 
                 let nameSpan = document.createElement('span');
-                nameSpan.className = `text-sm font-semibold ${isChecked ? 'text-blue-900' : 'text-slate-700'}`;
+                nameSpan.className = `text-xs font-semibold ${isChecked ? 'text-blue-950 font-bold' : 'text-slate-700'}`;
                 nameSpan.textContent = name;
 
                 leftDiv.appendChild(iconBox);
                 leftDiv.appendChild(nameSpan);
 
                 let badge = document.createElement('span');
-                badge.className = `text-xs px-2 py-0.5 rounded-full font-bold ${score === 10 ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'}`;
+                badge.className = `text-[10px] px-2 py-0.5 rounded-full font-bold ${score === 10 ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'}`;
                 badge.textContent = isChecked ? (score === 10 ? '참석(10)' : '참석(5)') : '미체크';
 
                 card.appendChild(leftDiv);
@@ -267,7 +245,7 @@
 
         function toggleMember(name) {
             if (!clickedStates[name]) {
-                clickedStates[name] = 10; // 기본 참석 10점
+                clickedStates[name] = 10;
             } else if (clickedStates[name] === 10) {
                 clickedStates[name] = 5;
             } else {
@@ -285,7 +263,6 @@
             const selectOpt = document.getElementById('attendance-date').selectedOptions[0];
             const month = selectOpt ? selectOpt.dataset.month : '11';
 
-            // 기존 해당 날짜 로그 제거 후 새로 구성
             logs = logs.filter(l => l.date !== selectedDate);
             
             for (let name in clickedStates) {
@@ -307,7 +284,6 @@
             const statsList = document.getElementById('stats-list');
             statsList.innerHTML = '';
 
-            // 점수 계산
             let scores = {};
             members.forEach(m => scores[m] = 0);
 
@@ -321,7 +297,6 @@
                 }
             });
 
-            // 점수 높은 순 정렬 (0점인 멤버는 누적 현황에서 숨김 처리)
             let sortedScores = Object.entries(scores)
                 .filter(([name, score]) => score > 0)
                 .sort((a, b) => b[1] - a[1]);
@@ -333,24 +308,24 @@
 
             sortedScores.forEach(([name, score], index) => {
                 let row = document.createElement('div');
-                row.className = "flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100";
+                row.className = "flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100";
                 
                 let rankDiv = document.createElement('div');
-                rankDiv.className = "flex items-center gap-3";
+                rankDiv.className = "flex items-center gap-2.5";
                 
                 let rankBadge = document.createElement('span');
-                rankBadge.className = `w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index === 0 ? 'bg-amber-400 text-white shadow-sm' : index === 1 ? 'bg-slate-300 text-white' : index === 2 ? 'bg-amber-600 text-white' : 'bg-slate-200 text-slate-600'}`;
+                rankBadge.className = `w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${index === 0 ? 'bg-amber-400 text-white' : index === 1 ? 'bg-slate-300 text-white' : index === 2 ? 'bg-amber-600 text-white' : 'bg-slate-200 text-slate-600'}`;
                 rankBadge.textContent = index + 1;
 
                 let nameSpan = document.createElement('span');
-                nameSpan.className = "text-sm font-bold text-slate-800";
+                nameSpan.className = "text-xs font-bold text-slate-800";
                 nameSpan.textContent = name;
 
                 rankDiv.appendChild(rankBadge);
                 rankDiv.appendChild(nameSpan);
 
                 let scoreSpan = document.createElement('span');
-                scoreSpan.className = "text-sm font-extrabold text-blue-600";
+                scoreSpan.className = "text-xs font-extrabold text-blue-600";
                 scoreSpan.textContent = score + "점";
 
                 row.appendChild(rankDiv);
@@ -359,7 +334,6 @@
             });
         }
 
-        // 관리자 패널 관련 함수
         function toggleAdminPanel() {
             const panel = document.getElementById('admin-panel');
             panel.classList.toggle('hidden');
@@ -373,7 +347,7 @@
             list.innerHTML = '';
             members.forEach(name => {
                 let tag = document.createElement('span');
-                tag.className = "inline-flex items-center gap-1 bg-white border border-slate-200 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 shadow-sm";
+                tag.className = "inline-flex items-center gap-1 bg-white border border-slate-200 px-2.5 py-1 rounded-lg text-[11px] font-medium text-slate-700 shadow-sm";
                 tag.innerHTML = `${name} <button onclick="removeMember('${name}')" class="text-slate-400 hover:text-red-500 ml-1"><i class="fa-solid fa-xmark"></i></button>`;
                 list.appendChild(tag);
             });
