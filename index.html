@@ -10,6 +10,7 @@
     <link rel="icon" sizes="192x192" href="todal_attendance_og.jpg">
     <link rel="icon" href="todal_attendance_og.jpg" type="image/jpeg">
 
+    <!-- 🌟 카카오톡 공유 시 미리보기 이미지 및 제목/설정 태그 -->
     <meta property="property" content="website">
     <meta property="og:title" content="복사골마라톤클럽 일요운동 출석부">
     <meta property="og:description" content="일요일 달리기 모임 출석 및 누적현황 관리 시스템">
@@ -74,18 +75,6 @@
         
         .sunday-stat-badge { font-size: 0.75rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 3px 8px; border-radius: 5px; display: inline-block; width: fit-content; }
         .sunday-item-btn.active .sunday-stat-badge { background: #dbeafe; color: #1e40af; }
-
-        .search-box-container { margin-bottom: 8px; }
-        .search-input { width: 100%; padding: 9px 12px; font-size: 0.9rem; border: 1.5px solid var(--border); border-radius: 8px; outline: none; box-sizing: border-box; background: #ffffff; font-weight: 700; transition: border-color 0.2s; }
-        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-
-        .summary-status-box { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 6px; margin-bottom: 10px; text-align: center; gap: 2px; }
-        .summary-status-box div { flex: 1; display: flex; flex-direction: column; font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
-        .summary-status-box .stat-total { color: var(--primary); font-size: 0.82rem; font-weight: 900; }
-        .summary-status-box .stat-workout { color: var(--success); }
-        .summary-status-box .stat-attend { color: var(--info); }
-        .summary-status-box .stat-comp { color: var(--warning); }
-        .summary-status-box .count-num { font-size: 0.88rem; font-weight: 800; margin-top: 1px; }
 
         .member-card { display: flex; flex-direction: column; padding: 8px 10px; margin-bottom: 6px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .member-card.checked-10 { background-color: #ecfdf5 !important; border-color: #34d399 !important; border-left: 5px solid var(--success) !important; }
@@ -152,26 +141,13 @@
                     <div class="sunday-vertical-group" id="sunday-vertical-wrapper"></div>
                 </div>
 
-                <!-- 🔍 이름 검색창 -->
-                <div class="search-box-container">
-                    <input type="text" id="member-search-input" class="search-input" placeholder="🔍 회원 이름 검색..." oninput="renderCheckinList()">
-                </div>
-
-                <!-- 📊 모바일 최적화 참석현황 요약 박스 -->
-                <div class="summary-status-box" id="summary-status-box">
-                    <div class="stat-total">총인원 <span class="count-num" id="cnt-total">0명</span></div>
-                    <div class="stat-workout">참석(운동) <span class="count-num" id="cnt-workout">0명</span></div>
-                    <div class="stat-attend">참석 <span class="count-num" id="cnt-attend">0명</span></div>
-                    <div class="stat-comp">대회 <span class="count-num" id="cnt-comp">0명</span></div>
-                </div>
-
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
             </div>
 
             <!-- 2번 패널: 누적현황 -->
             <div class="swipe-pane" id="pane-stats">
                 <div class="month-filter" id="stats-month-buttons"></div>
-                <div class="stats-current-date-box" id="stats-current-date-text">[ 기준일자 ]</div>
+                <div class="stats-current-date-box" id="stats-current-date-text">[ 2026년 11월 기준 ]</div>
                 <div id="stats-list" class="loading">누적 데이터 계산 중...</div>
             </div>
         </div>
@@ -193,58 +169,32 @@
             <button onclick="addMember()">회원 추가</button>
         </div>
         <div id="admin-member-list"></div>
-
-        <h3 style="margin-top:14px; color:#fca5a5;">⚠️ 데이터 전체 초기화</h3>
-        <button onclick="resetAllData()" style="width:100%; background:#dc2626; color:white; border:none; padding:10px; border-radius:7px; cursor:pointer; font-weight:800;">출석 및 누적 데이터 전부 0으로 초기화</button>
-
         <button onclick="toggleAdminMode()" style="width:100%; margin-top:12px; background:#475569; color:white; border:none; padding:9px; border-radius:7px; cursor:pointer; font-weight:800;">설정 닫기</button>
     </div>
 
+    <!-- 우측 하단 구석 톱니바퀴 기호 버튼 -->
     <div class="footer-setting-box">
         <button class="admin-gear-icon-btn" id="admin-open-btn" title="관리자 설정">⚙️</button>
     </div>
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRHaINNCS3_ynS-F6hQi6hDby790lIOllmv7uOfDNSoyNfN2hNMIpev9ncu9IDOc419A/exec";
+    // 🌟 구글 Apps Script 웹앱 URL (배포된 URL 입력)
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPXWM6bKfUYZgRL5hC947VmRQgtB8RBrylaTtOO0Yb2zBVuRwIBUQtcqgNgiU9FEfuaA/exec";
 
     const DEFAULT_MEMBERS = [
-        { name: "곽병우" }, { name: "권용문" }, { name: "김경기" }, { name: "김귀동" }, 
-        { name: "김근식" }, { name: "김덕원" }, { name: "김봉근" }, { name: "김상선" }, 
-        { name: "김영학" }, { name: "김은성" }, { name: "김이재" }, { name: "김인환" }, 
-        { name: "김장곤" }, { name: "김장선" }, { name: "김정구" }, { name: "김정균" }, 
-        { name: "김정빈" }, { name: "김정환" }, { name: "김종수" }, { name: "김진철" }, 
-        { name: "김창선" }, { name: "김태수" }, { name: "김형섭" }, { name: "김환수" }, 
-        { name: "김효중" }, { name: "김희성" }, { name: "남중원" }, { name: "노현종" }, 
-        { name: "노진규" }, { name: "문성호" }, { name: "민병일" }, { name: "박광남" }, 
-        { name: "박정호" }, { name: "박정후" }, { name: "박지혜" }, { name: "박한라" }, 
-        { name: "방지원" }, { name: "방철규" }, { name: "변흥주" }, { name: "상선호" }, 
-        { name: "서문오룡" }, { name: "송세용" }, { name: "송영숙" }, { name: "송재동" }, 
-        { name: "심재현" }, { name: "안상준" }, { name: "양해수" }, { name: "오영석" }, 
-        { name: "우명수" }, { name: "원종만" }, { name: "유경호" }, { name: "유성수" }, 
-        { name: "유영종" }, { name: "윤명기" }, { name: "윤영종" }, { name: "은대영" }, 
-        { name: "이강훈" }, { name: "이구철" }, { name: "이달재" }, { name: "이도희" }, 
-        { name: "이동기" }, { name: "이동섭" }, { name: "이미경" }, { name: "이상봉" }, 
-        { name: "이석형" }, { name: "이세형" }, { name: "이실권" }, { name: "이원우" }, 
-        { name: "이은순" }, { name: "이재응" }, { name: "이재학" }, { name: "이정숙" }, 
-        { name: "이종호" }, { name: "이주영" }, { name: "이진수" }, { name: "이학조" }, 
-        { name: "이한기" }, { name: "이해식" }, { name: "이현석" }, { name: "이현조" }, 
-        { name: "이호병" }, { name: "임윤석" }, { name: "임장수" }, { name: "장경문" }, 
-        { name: "전경수" }, { name: "정범희" }, { name: "정세원" }, { name: "정수일" }, 
-        { name: "정연호" }, { name: "정영환" }, { name: "정오영" }, { name: "정일흥" }, 
-        { name: "정재훈" }, { name: "정정환" }, { name: "정제민" }, { name: "정종현" }, 
-        { name: "정도영" }, { name: "정진형" }, { name: "정하근" }, { name: "정현주" }, 
-        { name: "정호진" }, { name: "조성국" }, { name: "조언호" }, { name: "조영철" }, 
-        { name: "조재광" }, { name: "조한복" }, { name: "진용남" }, { name: "차준영" }, 
-        { name: "최규식" }, { name: "최기석" }, { name: "최병일" }, { name: "최상호" }, 
-        { name: "최순규" }, { name: "최영민" }, { name: "최유식" }, { name: "최잔디" }, 
-        { name: "최정엽" }, { name: "최진석" }, { name: "필동만" }, { name: "하대석" }, 
-        { name: "한영수" }, { name: "허만수" }, { name: "황문섭" }, { name: "황연성" }, 
-        { name: "지덕수" }
+        { name: "곽병우" }, { name: "김경기" }, { name: "김미향" }, { name: "김은성" }, 
+        { name: "김정구" }, { name: "김정균" }, { name: "김진철" }, { name: "김태수" }, 
+        { name: "노현종" }, { name: "박광남" }, { name: "박정후" }, { name: "박지혜" }, 
+        { name: "송영숙" }, { name: "은대영" }, { name: "이동기" }, { name: "이세형" }, 
+        { name: "이실권" }, { name: "이은순" }, { name: "이재응" }, { name: "이정숙" }, 
+        { name: "이종호" }, { name: "이학조" }, { name: "이해식" }, { name: "이호병" }, 
+        { name: "정세원" }, { name: "정하근" }, { name: "정현주" }, { name: "정호진" }, 
+        { name: "조성국" }, { name: "최순규" }, { name: "최잔디" }, { name: "황연성" }
     ];
 
     let globalMembers = JSON.parse(localStorage.getItem('boksakol_sunday_members_v2')) || [...DEFAULT_MEMBERS];
-    let globalLogs = [];
+    let globalLogs = JSON.parse(localStorage.getItem('boksakol_sunday_logs_v2')) || [];
 
     let adminPassword = localStorage.getItem('boksakol_sunday_admin_pwd') || "1234";
 
@@ -398,18 +348,16 @@
 
         const dateStatsMap = {};
         globalLogs.forEach(log => {
+            const dStr = String(log.date).trim();
             const sNum = Number(log.score);
             if ([10, 5, 99].includes(sNum)) {
-                const cleanLogDate = String(log.date || "").replace(/[^0-9]/g, '');
-                if (cleanLogDate) {
-                    if (!dateStatsMap[cleanLogDate]) {
-                        dateStatsMap[cleanLogDate] = { workout: 0, attend: 0, comp: 0, total: 0 };
-                    }
-                    if (sNum === 10) dateStatsMap[cleanLogDate].workout += 1;
-                    else if (sNum === 5) dateStatsMap[cleanLogDate].attend += 1;
-                    else if (sNum === 99) dateStatsMap[cleanLogDate].comp += 1;
-                    dateStatsMap[cleanLogDate].total += 1;
+                if (!dateStatsMap[dStr]) {
+                    dateStatsMap[dStr] = { workout: 0, attend: 0, comp: 0, total: 0 };
                 }
+                if (sNum === 10) dateStatsMap[dStr].workout += 1;
+                else if (sNum === 5) dateStatsMap[dStr].attend += 1;
+                else if (sNum === 99) dateStatsMap[dStr].comp += 1;
+                dateStatsMap[dStr].total += 1;
             }
         });
 
@@ -421,9 +369,7 @@
             
             const isFuture = targetDate > today;
             const isSelected = (dStr === selectedDateStr);
-            
-            const dStrClean = dStr.replace(/[^0-9]/g, '');
-            const dateStat = dateStatsMap[dStrClean] || { workout: 0, attend: 0, comp: 0, total: 0 };
+            const dateStat = dateStatsMap[dStr] || { workout: 0, attend: 0, comp: 0, total: 0 };
 
             const displayDateText = dStr.replace(/^\d{4}년\s*/, '');
 
@@ -488,51 +434,41 @@
         localStorage.setItem('boksakol_sunday_logs_v2', JSON.stringify(globalLogs));
     }
 
+    // 🌟 구글 시트 데이터 로드
     async function loadDataFromSheet() {
-        sortMembers();
-        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_SCRIPT_ID")) return;
         try {
-            const res = await fetch(GOOGLE_SCRIPT_URL);
-            const result = await res.json();
-            if (result.status === "success" && Array.isArray(result.logs)) {
-                globalLogs = result.logs.map(log => ({
-                    name: String(log.name || "").trim(),
-                    date: String(log.date || "").trim(),
-                    score: Number(log.score),
-                    month: Number(log.month) || 0
-                })).filter(log => log.name && log.date && [10, 5, 99].includes(log.score));
+            const response = await fetch(GOOGLE_SCRIPT_URL);
+            const result = await response.json();
+            if (result && result.status === "success") {
+                if (result.members && result.members.length > 0) {
+                    globalMembers = result.members.map(m => ({ name: m.name || m }));
+                }
+                if (result.logs) {
+                    globalLogs = result.logs;
+                }
                 saveLocally();
             }
-        } catch (e) {
-            console.error("구글 시트 데이터 로드 실패:", e);
+        } catch (error) {
+            console.error("구글 시트 데이터 로드 실패 (오프라인 모드 동작):", error);
         }
+        sortMembers();
     }
 
+    // 🌟 구글 시트 데이터 동기화 저장
     async function saveDataToSheet() {
-        sortMembers();
         saveLocally();
-        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_SCRIPT_ID")) return;
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: "saveLogs", logs: globalLogs })
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    members: globalMembers,
+                    logs: globalLogs
+                })
             });
-        } catch (e) {
-            console.error("구글 시트 데이터 저장 실패:", e);
-        }
-    }
-
-    async function resetAllData() {
-        if (confirm("정말로 모든 출석 기록과 누적 점수를 0으로 초기화하시겠습니까? (이 작업은 되돌릴 수 없습니다)")) {
-            globalLogs = [];
-            saveLocally();
-            await saveDataToSheet();
-            alert("모든 데이터가 초기화되었습니다.");
-            renderSundayVerticalList();
-            renderStats();
-            toggleAdminMode();
+        } catch (error) {
+            console.error("구글 시트 저장 실패:", error);
         }
     }
 
@@ -614,7 +550,6 @@
 
     function renderCheckinList() {
         const listDiv = document.getElementById('member-list');
-        const searchInput = document.getElementById('member-search-input');
         if (!listDiv) return;
         listDiv.innerHTML = '';
 
@@ -625,32 +560,10 @@
         const dayAttendance = {};
         globalLogs.forEach(log => {
             const sNum = Number(log.score);
-            const logDateClean = String(log.date || "").replace(/[^0-9]/g, '');
-            const selectedDateClean = String(selectedDateStr || "").replace(/[^0-9]/g, '');
-
-            if (logDateClean && selectedDateClean && logDateClean === selectedDateClean && [10, 5, 99].includes(sNum)) {
+            if (String(log.date).trim() === String(selectedDateStr).trim() && [10, 5, 99].includes(sNum)) {
                 dayAttendance[String(log.name).trim()] = sNum;
             }
         });
-
-        let totalCount = 0;
-        let workoutCount = 0;
-        let attendCount = 0;
-        let compCount = 0;
-
-        Object.values(dayAttendance).forEach(score => {
-            totalCount++;
-            if (score === 10) workoutCount++;
-            else if (score === 5) attendCount++;
-            else if (score === 99) compCount++;
-        });
-
-        document.getElementById('cnt-total').innerText = totalCount + "명";
-        document.getElementById('cnt-workout').innerText = workoutCount + "명";
-        document.getElementById('cnt-attend').innerText = attendCount + "명";
-        document.getElementById('cnt-comp').innerText = compCount + "명";
-
-        const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
         const getGroupOrder = (score) => {
             if (score === 10) return 1;
@@ -675,17 +588,10 @@
             return nameA.localeCompare(nameB, 'ko');
         });
 
-        let renderedCount = 0;
-
         sortedMembers.forEach((member, index) => {
             const name = String(member.name || "").trim();
             if (!name) return;
-
-            if (searchQuery && !name.toLowerCase().includes(searchQuery)) {
-                return;
-            }
-
-            renderedCount++;
+            
             const score = dayAttendance[name] || 0;
             const isChecked = [10, 5, 99].includes(score);
 
@@ -763,11 +669,6 @@
             card.appendChild(buttonGroup);
             listDiv.appendChild(card);
         });
-
-        if (renderedCount === 0) {
-            listDiv.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8; font-weight:700;'>검색된 회원이 없습니다.</div>";
-        }
-
         updateSwipeWrapperHeight();
     }
 
@@ -789,12 +690,7 @@
             if (!confirm(`[${targetDate.replace(/^\d{4}년\s*/, '')}] [${cleanName}]님을 [${label}]으로 기록하시겠습니까?`)) return;
         }
 
-        const targetDateClean = String(targetDate).replace(/[^0-9]/g, '');
-        globalLogs = globalLogs.filter(log => {
-            const logDateClean = String(log.date || "").replace(/[^0-9]/g, '');
-            const logNameClean = String(log.name || "").trim();
-            return !(logNameClean === cleanName && logDateClean === targetDateClean);
-        });
+        globalLogs = globalLogs.filter(log => !(String(log.name).trim() === cleanName && String(log.date).trim() === targetDate));
         
         if ([10, 5, 99].includes(score)) {
             let mMatch = targetDate.match(/(\d+)월/);
@@ -817,7 +713,6 @@
         
         const now = new Date();
         const y = now.getFullYear();
-        const m = now.getMonth() + 1;
         
         const getLatestSundayDateStr = (year, monthNum) => {
             let targetDate = new Date(year, monthNum, 0);
@@ -858,11 +753,9 @@
         const uniqueLogs = new Map();
         globalLogs.forEach(log => {
             const sNum = Number(log.score);
-            const cleanName = String(log.name || "").trim();
-            const cleanDate = String(log.date || "").replace(/[^0-9]/g, '');
-            if (cleanName && cleanDate && [10, 5, 99].includes(sNum)) {
-                const key = cleanDate + "_" + cleanName;
-                uniqueLogs.set(key, { name: cleanName, date: log.date, score: sNum, month: log.month });
+            if (log.name && log.date && [10, 5, 99].includes(sNum)) {
+                const key = String(log.date).trim() + "_" + String(log.name).trim();
+                uniqueLogs.set(key, { name: String(log.name).trim(), date: String(log.date).trim(), score: sNum, month: log.month });
             }
         });
 
@@ -969,11 +862,6 @@
 
         swipeContainer.addEventListener('touchmove', (e) => {
             if (!isSwiping) return;
-            let currentX = e.touches[0].clientX;
-            let currentY = e.touches[0].clientY;
-            let diffX = Math.abs(currentX - startX);
-            let diffY = Math.abs(currentY - startY);
-            if (diffX > diffY) {}
         }, { passive: true });
 
         swipeContainer.addEventListener('touchend', (e) => {
@@ -998,9 +886,10 @@
         initCheckinMonthButtons();
         initStatsMonthButtons();
         sortMembers();
+        renderSundayVerticalList();
+        renderStats();
         
         await loadDataFromSheet();
-        
         renderSundayVerticalList();
         renderStats();
     }
