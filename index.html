@@ -209,7 +209,7 @@
 
 <script>
     // 🌟 구글 Apps Script 웹 앱 URL 입력
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbym4d7r-Su8_vS7SFHGoyDJi_5-mcL-8YdxUkuaZVd_koB_LCpE9Ca6uHk1aDoqjSngtA/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRHaINNCS3_ynS-F6hQi6hDby790lIOllmv7uOfDNSoyNfN2hNMIpev9ncu9IDOc419A/exec";
 
     // 🌟 가나다순으로 정렬된 전체 회원 명단
     const DEFAULT_MEMBERS = [
@@ -402,16 +402,17 @@
 
         const dateStatsMap = {};
         globalLogs.forEach(log => {
-            const dStr = String(log.date).trim();
             const sNum = Number(log.score);
             if ([10, 5, 99].includes(sNum)) {
-                if (!dateStatsMap[dStr]) {
-                    dateStatsMap[dStr] = { workout: 0, attend: 0, comp: 0, total: 0 };
+                // 날짜 키 정규화 매칭
+                const cleanLogDate = String(log.date || "").trim();
+                if (!dateStatsMap[cleanLogDate]) {
+                    dateStatsMap[cleanLogDate] = { workout: 0, attend: 0, comp: 0, total: 0 };
                 }
-                if (sNum === 10) dateStatsMap[dStr].workout += 1;
-                else if (sNum === 5) dateStatsMap[dStr].attend += 1;
-                else if (sNum === 99) dateStatsMap[dStr].comp += 1;
-                dateStatsMap[dStr].total += 1;
+                if (sNum === 10) dateStatsMap[cleanLogDate].workout += 1;
+                else if (sNum === 5) dateStatsMap[cleanLogDate].attend += 1;
+                else if (sNum === 99) dateStatsMap[cleanLogDate].comp += 1;
+                dateStatsMap[cleanLogDate].total += 1;
             }
         });
 
@@ -488,7 +489,7 @@
         localStorage.setItem('boksakol_sunday_logs_v2', JSON.stringify(globalLogs));
     }
 
-    // 🌟 1. 데이터 로드 안정성 강화 (통신 실패 시 로컬 데이터 보호)
+    // 🌟 구글 시트에서 최신 데이터 안전 로드 (실패 시 로컬 데이터 보호)
     async function loadDataFromSheet() {
         sortMembers();
         if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_SCRIPT_ID")) return;
@@ -616,7 +617,7 @@
         const dayAttendance = {};
         globalLogs.forEach(log => {
             const sNum = Number(log.score);
-            // 🌟 2. 날짜 비교 시 요일/공백 차이 무관하게 숫자 기준 정밀 매칭
+            // 🌟 날짜 숫자 정밀 매칭 (요일/공백 차이 완벽 극복)
             const logDateClean = String(log.date || "").replace(/[^0-9]/g, '');
             const selectedDateClean = String(selectedDateStr || "").replace(/[^0-9]/g, '');
 
@@ -988,14 +989,13 @@
         });
     }
 
-    // 🌟 3. 앱 실행 순서 정비 (시트 데이터를 확실히 불러온 뒤 화면을 그림)
+    // 🌟 앱 실행 시 구글 시트 데이터를 완벽히 로드한 뒤 화면 구성
     async function initApp() {
         initEventBindings();
         initCheckinMonthButtons();
         initStatsMonthButtons();
         sortMembers();
         
-        // 구글 시트에서 최신 데이터를 완전히 불러올 때까지 대기
         await loadDataFromSheet();
         
         renderSundayVerticalList();
