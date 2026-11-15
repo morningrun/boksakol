@@ -115,6 +115,9 @@
 
         .hidden { display: none !important; }
         .loading { text-align: center; color: var(--text-sub); padding: 25px; font-weight: 700; }
+        
+        /* 동기화 상태 표시 배지 */
+        .sync-status { text-align: center; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 8px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -122,6 +125,7 @@
 <div class="container">
     <div class="main-title-box">
         <div class="main-title">🏃‍♂️ 복사골 일요운동 출석부</div>
+        <div class="sync-status" id="sync-status-text">☁️ 구글 시트 연결 대기 중...</div>
     </div>
     
     <div class="tab-group">
@@ -179,8 +183,8 @@
 </div>
 
 <script>
-    // 🌟 구글 Apps Script 웹앱 URL (배포된 URL 입력)
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPXWM6bKfUYZgRL5hC947VmRQgtB8RBrylaTtOO0Yb2zBVuRwIBUQtcqgNgiU9FEfuaA/exec";
+    // 🌟 구글 Apps Script 웹앱 URL (새로 배포한 웹앱 URL을 여기에 입력하세요)
+    const GOOGLE_SCRIPT_URL = "여기에_배포된_Apps_Script_웹앱_URL을_입력하세요";
 
     const DEFAULT_MEMBERS = [
         { name: "곽병우" }, { name: "김경기" }, { name: "김미향" }, { name: "김은성" }, 
@@ -205,6 +209,14 @@
 
     const currentYear = new Date().getFullYear();
     document.getElementById('current-year-text').innerText = currentYear;
+
+    function updateSyncStatus(msg, isError = false) {
+        const statusEl = document.getElementById('sync-status-text');
+        if (statusEl) {
+            statusEl.innerText = msg;
+            statusEl.style.color = isError ? '#dc2626' : '#059669';
+        }
+    }
 
     function updateSwipeWrapperHeight() {
         const calculate = () => {
@@ -436,7 +448,12 @@
 
     // 🌟 구글 시트 데이터 로드
     async function loadDataFromSheet() {
+        if (GOOGLE_SCRIPT_URL.includes("여기에")) {
+            updateSyncStatus("⚠️ Apps Script URL 미설정 (오프라인 모드)");
+            return;
+        }
         try {
+            updateSyncStatus("🔄 구글 시트 동기화 중...");
             const response = await fetch(GOOGLE_SCRIPT_URL);
             const result = await response.json();
             if (result && result.status === "success") {
@@ -447,9 +464,11 @@
                     globalLogs = result.logs;
                 }
                 saveLocally();
+                updateSyncStatus("✅ 구글 시트 동기화 완료");
             }
         } catch (error) {
-            console.error("구글 시트 데이터 로드 실패 (오프라인 모드 동작):", error);
+            console.error("구글 시트 로드 실패:", error);
+            updateSyncStatus("⚠️ 오프라인 모드로 동작 중", true);
         }
         sortMembers();
     }
@@ -457,7 +476,9 @@
     // 🌟 구글 시트 데이터 동기화 저장
     async function saveDataToSheet() {
         saveLocally();
+        if (GOOGLE_SCRIPT_URL.includes("여기에")) return;
         try {
+            updateSyncStatus("💾 저장 중...");
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -467,8 +488,10 @@
                     logs: globalLogs
                 })
             });
+            updateSyncStatus("✅ 구글 시트 저장 완료");
         } catch (error) {
             console.error("구글 시트 저장 실패:", error);
+            updateSyncStatus("❌ 저장 실패 (네트워크 확인)", true);
         }
     }
 
