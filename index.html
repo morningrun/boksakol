@@ -44,7 +44,7 @@
         .main-title-box { text-align: center; margin: 6px 0 12px 0; }
         .main-title { font-size: 1.6rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; background: linear-gradient(135deg, #0f172a 0%, #334155 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .tab-group { display: flex; gap: 6px; margin-bottom: 14px; background: #e2e8f0; padding: 4px; border-radius: 12px; position: sticky; top: 6px; z-index: 10; backdrop-filter: blur(12px); }
+        .tab-group { display: flex; gap: 6px; margin-bottom: 14px; background: #e2e8f0; padding: 4px; border-radius: 12px; }
         .tab-btn { flex: 1; padding: 9px 4px; font-size: 0.88rem; border: none; background: transparent; color: var(--text-sub); font-weight: 700; border-radius: 9px; cursor: pointer; transition: all 0.25s ease; text-align: center; }
         .tab-btn.active { background: var(--card-bg); color: var(--accent); box-shadow: 0 4px 12px rgba(37,99,235,0.12); }
 
@@ -80,20 +80,19 @@
         .sunday-stat-badge { font-size: 0.75rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 6px; display: inline-block; width: fit-content; }
         .sunday-item-btn.active .sunday-stat-badge { background: #dbeafe; color: #1e40af; }
 
-        /* 고급스러운 가로 3분할 출석현황 요약 박스 컨테이너 */
-        .checkin-triple-container { display: flex; gap: 8px; margin-bottom: 14px; width: 100%; box-sizing: border-box; padding: 0; }
-        .checkin-column-box { flex: 1; border-radius: 12px; padding: 8px 6px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.02); box-sizing: border-box; transition: transform 0.2s; }
-        .checkin-column-box:hover { transform: translateY(-2px); }
+        /* 가로 3분할 출석현황 요약 박스 컨테이너 (폰트 찌그러짐 방지 및 여백 최적화) */
+        .checkin-triple-container { display: flex; gap: 6px; margin-bottom: 14px; width: 100%; box-sizing: border-box; padding: 0; }
+        .checkin-column-box { flex: 1; border-radius: 12px; padding: 8px 4px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.02); box-sizing: border-box; }
         
-        .checkin-column-title { font-size: 0.84rem; font-weight: 800; text-align: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1.5px solid rgba(0,0,0,0.06); white-space: nowrap; line-height: 1.3; }
-        .checkin-column-sub { font-size: 0.7rem; font-weight: 700; opacity: 0.8; display: block; margin-top: 2px; }
+        .checkin-column-title { font-size: 0.75rem; font-weight: 800; text-align: center; margin-bottom: 6px; padding-bottom: 5px; border-bottom: 1.5px solid rgba(0,0,0,0.06); white-space: nowrap; line-height: 1.2; }
+        .checkin-column-sub { font-size: 0.65rem; font-weight: 700; opacity: 0.85; display: block; margin-top: 1px; }
         
-        .checkin-column-names { display: flex; flex-direction: column; gap: 3px; font-size: 0.82rem; font-weight: 600; color: var(--text-main); text-align: left; padding: 0 2px; max-height: 220px; overflow-y: auto; }
-        .checkin-name-item { background: rgba(255,255,255,0.6); padding: 4px 6px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: all 0.15s; display: flex; gap: 6px; align-items: center; border: 1px solid rgba(255,255,255,0.8); }
+        .checkin-column-names { display: flex; flex-direction: column; gap: 2px; font-size: 0.76rem; font-weight: 600; color: var(--text-main); text-align: left; padding: 0 1px; max-height: 220px; overflow-y: auto; }
+        .checkin-name-item { background: rgba(255,255,255,0.7); padding: 3px 4px; border-radius: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: all 0.15s; display: flex; gap: 3px; align-items: center; border: 1px solid rgba(255,255,255,0.9); }
         .checkin-name-item:hover { background: #ffffff; color: var(--accent); box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-        .checkin-item-num { color: var(--text-sub); font-size: 0.72rem; font-weight: 700; min-width: 16px; text-align: right; flex-shrink: 0; }
+        .checkin-item-num { color: var(--text-sub); font-size: 0.68rem; font-weight: 700; min-width: 14px; text-align: right; flex-shrink: 0; }
 
-        /* 고급스러운 미참석 회원 카드 스타일 */
+        /* 미참석 회원 카드 스타일 */
         .member-card { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; margin-bottom: 6px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); width: 100%; box-sizing: border-box; transition: all 0.2s; }
         .member-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
         .member-info { display: flex; align-items: center; gap: 8px; flex-shrink: 0; min-width: 100px; }
@@ -715,7 +714,7 @@
         namesWrapper.className = 'checkin-column-names';
 
         if (listData.length === 0) {
-            namesWrapper.innerHTML = `<div style="color:#94a3b8; font-size:0.75rem; padding:10px 0; text-align:center;">없음</div>`;
+            namesWrapper.innerHTML = `<div style="color:#94a3b8; font-size:0.72rem; padding:10px 0; text-align:center;">없음</div>`;
         } else {
             listData.forEach((m, idx) => {
                 const nameItem = document.createElement('div');
