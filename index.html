@@ -78,29 +78,22 @@
         .sunday-stat-badge { font-size: 0.73rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block; width: fit-content; }
         .sunday-item-btn.active .sunday-stat-badge { background: #dbeafe; color: #1e40af; }
 
-        /* 그룹 박스 스타일 (상단 출석 유형별 세로 모아보기 박스) */
-        .checkin-group-box { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px; margin-bottom: 8px; }
-        .checkin-group-title { font-size: 0.85rem; font-weight: 800; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-        .checkin-group-list { display: flex; flex-direction: column; gap: 4px; }
+        /* 가로 3분할 출석현황 요약 박스 컨테이너 */
+        .checkin-triple-container { display: flex; gap: 5px; margin-bottom: 10px; width: 100%; box-sizing: border-box; }
+        .checkin-column-box { flex: 1; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; min-width: 0; }
+        .checkin-column-title { font-size: 0.78rem; font-weight: 800; text-align: center; margin-bottom: 5px; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        .checkin-column-names { display: flex; flex-direction: column; gap: 3px; max-height: 150px; overflow-y: auto; font-size: 0.78rem; font-weight: 700; color: var(--text-main); text-align: center; }
+        .checkin-name-item { background: #ffffff; padding: 3px 2px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+        .checkin-name-item:hover { background: #eff6ff; color: var(--accent); }
 
-        /* 회원 카드 스타일 */
-        .member-card { display: flex; flex-direction: column; padding: 6px 8px; margin-bottom: 5px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 7px; gap: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-        .member-card.checked-10 { background-color: #ecfdf5 !important; border-color: #34d399 !important; border-left: 4px solid var(--success) !important; }
-        .member-card.checked-5 { background-color: #f0f9ff !important; border-color: #38bdf8 !important; border-left: 4px solid var(--info) !important; }
-        .member-card.checked-comp { background-color: #fffbeb !important; border-color: #fbbf24 !important; border-left: 4px solid var(--warning) !important; }
-
-        .member-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .member-name { font-weight: 800; font-size: 0.88rem; color: var(--primary); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-        .member-index { font-size: 0.72rem; color: #64748b; font-weight: 700; width: 22px; text-align: right; }
-        .badge { font-size: 0.7rem; font-weight: 800; padding: 1px 5px; border-radius: 4px; white-space: nowrap; }
+        /* 미체크 회원 카드 스타일 (현행 유지) */
+        .member-card { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; margin-bottom: 5px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 7px; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .member-info { display: flex; align-items: center; gap: 6px; flex-shrink: 0; min-width: 95px; }
+        .member-name { font-weight: 800; font-size: 0.9rem; color: var(--primary); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .member-index { font-size: 0.72rem; color: #64748b; font-weight: 700; width: 20px; text-align: right; }
         
-        .btn-group { display: flex; gap: 3px; width: 100%; }
+        .btn-group { display: flex; gap: 3px; flex: 1; justify-content: flex-end; }
         .btn-group button { flex: 1; padding: 6px 2px; font-size: 0.72rem; border: 1px solid var(--border); border-radius: 5px; cursor: pointer; font-weight: 700; background: #f8fafc; color: var(--text-sub); text-align: center; white-space: nowrap; }
-        
-        button.selected-10 { background: var(--success) !important; color: white !important; border-color: var(--success) !important; font-weight: 800; flex: 1; }
-        button.selected-5 { background: var(--info) !important; color: white !important; border-color: var(--info) !important; font-weight: 800; flex: 1; }
-        button.selected-comp { background: var(--warning) !important; color: white !important; border-color: var(--warning) !important; font-weight: 800; flex: 1; }
-        button.btn-modify { background: #fee2e2 !important; color: var(--danger) !important; border-color: #fca5a5 !important; font-weight: 800; width: 45px; flex: unset !important; }
 
         /* 누적현황 순위 리스트 슬림화 */
         .rank-card { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; margin-bottom: 5px; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 7px; gap: 3px; }
@@ -156,7 +149,7 @@
                     <input type="text" id="member-search-input" class="search-input" placeholder="🔍 회원 이름 검색..." oninput="renderCheckinList()">
                 </div>
 
-                <!-- 출석체크 리스트 영역 (상단 그룹 박스들 + 미체크 회원 리스트) -->
+                <!-- 출석체크 리스트 영역 (상단 가로 3분할 박스 + 하단 미체크 회원 리스트) -->
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
             </div>
 
@@ -634,7 +627,7 @@
             return;
         }
 
-        // 검색어가 없을 때: 유형별 세로 박스(참석(운동), 참석, 대회) + 미체크 회원 리스트
+        // 검색어가 없을 때: 상단 가로 3분할 박스 (참석(운동), 참석, 대회) + 하단 미체크 회원 리스트
         const workoutList = []; // 10점 (참석(운동))
         const attendList = [];  // 5점 (참석)
         const compList = [];    // 99점 (대회)
@@ -655,51 +648,30 @@
         compList.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
         uncheckList.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
 
-        // 1. 참석(운동) 그룹 박스
-        if (workoutList.length > 0) {
-            const box = document.createElement('div');
-            box.className = 'checkin-group-box';
-            box.innerHTML = `<div class="checkin-group-title" style="color:#059669;">🟢 참석(운동) 완료 (${workoutList.length}명)</div>`;
-            const innerList = document.createElement('div');
-            innerList.className = 'checkin-group-list';
-            workoutList.forEach(m => innerList.appendChild(createMemberCard(m, "", dayAttendance)));
-            box.appendChild(innerList);
-            listDiv.appendChild(box);
-        }
+        // 상단 가로 3분할 컨테이너 생성
+        const tripleContainer = document.createElement('div');
+        tripleContainer.className = 'checkin-triple-container';
 
-        // 2. 참석 그룹 박스
-        if (attendList.length > 0) {
-            const box = document.createElement('div');
-            box.className = 'checkin-group-box';
-            box.innerHTML = `<div class="checkin-group-title" style="color:#0284c7;">🔵 참석 완료 (${attendList.length}명)</div>`;
-            const innerList = document.createElement('div');
-            innerList.className = 'checkin-group-list';
-            attendList.forEach(m => innerList.appendChild(createMemberCard(m, "", dayAttendance)));
-            box.appendChild(innerList);
-            listDiv.appendChild(box);
-        }
+        // 1. 참석(운동) 컬럼
+        const colWorkout = createTripleColumn("참석(운동)", "#059669", workoutList);
+        // 2. 참석 컬럼
+        const colAttend = createTripleColumn("참석", "#0284c7", attendList);
+        // 3. 대회 컬럼
+        const colComp = createTripleColumn("대회", "#d97706", compList);
 
-        // 3. 대회 그룹 박스
-        if (compList.length > 0) {
-            const box = document.createElement('div');
-            box.className = 'checkin-group-box';
-            box.innerHTML = `<div class="checkin-group-title" style="color:#d97706;">🟠 대회 출전 (${compList.length}명)</div>`;
-            const innerList = document.createElement('div');
-            innerList.className = 'checkin-group-list';
-            compList.forEach(m => innerList.appendChild(createMemberCard(m, "", dayAttendance)));
-            box.appendChild(innerList);
-            listDiv.appendChild(box);
-        }
+        tripleContainer.appendChild(colWorkout);
+        tripleContainer.appendChild(colAttend);
+        tripleContainer.appendChild(colComp);
+        listDiv.appendChild(tripleContainer);
 
-        // 4. 미체크 회원 리스트 (현행 툴 유지)
+        // 하단 미체크 회원 리스트 (현행 툴 유지)
         if (uncheckList.length > 0) {
             const titleDiv = document.createElement('div');
-            titleDiv.style.cssText = "font-size:0.85rem; font-weight:800; color:var(--text-sub); margin:10px 0 6px 2px;";
+            titleDiv.style.cssText = "font-size:0.85rem; font-weight:800; color:var(--text-sub); margin:12px 0 6px 2px;";
             titleDiv.textContent = `📋 미체크 회원 (${uncheckList.length}명)`;
             listDiv.appendChild(titleDiv);
 
             uncheckList.forEach(m => {
-                // 전체 회원 번호 인덱스 찾기
                 const origIndex = globalMembers.findIndex(item => item.name === m.name) + 1;
                 listDiv.appendChild(createMemberCard(m, origIndex, dayAttendance));
             });
@@ -708,81 +680,70 @@
         updateSwipeWrapperHeight();
     }
 
+    function createTripleColumn(titleText, colorCode, listData) {
+        const col = document.createElement('div');
+        col.className = 'checkin-column-box';
+        
+        const title = document.createElement('div');
+        title.className = 'checkin-column-title';
+        title.style.color = colorCode;
+        title.textContent = `${titleText} (${listData.length})`;
+        col.appendChild(title);
+
+        const namesWrapper = document.createElement('div');
+        namesWrapper.className = 'checkin-column-names';
+
+        if (listData.length === 0) {
+            namesWrapper.innerHTML = `<div style="color:#94a3b8; font-size:0.72rem; padding:10px 0;">없음</div>`;
+        } else {
+            listData.forEach(m => {
+                const nameItem = document.createElement('div');
+                nameItem.className = 'checkin-name-item';
+                nameItem.textContent = m.name;
+                // 이름을 클릭하면 해당 회원의 출석 기록 수정(취소) 팝업 창이 뜨도록 연동
+                nameItem.title = "클릭하여 기록 수정/취소";
+                nameItem.addEventListener('click', () => handleCheckIn(m.name, 0));
+                namesWrapper.appendChild(nameItem);
+            });
+        }
+        col.appendChild(namesWrapper);
+        return col;
+    }
+
     function createMemberCard(member, displayIndex, dayAttendance) {
         const name = String(member.name || "").trim();
         const score = dayAttendance[name] || 0;
         const isChecked = [10, 5, 99].includes(score);
 
         const card = document.createElement('div');
-        let cardClass = 'member-card';
-        if (isChecked) {
-            if (score === 10) cardClass += ' checked-10';
-            else if (score === 5) cardClass += ' checked-5';
-            else if (score === 99) cardClass += ' checked-comp';
-        }
-        card.className = cardClass;
+        card.className = 'member-card';
         
-        let badgeHtml = '';
-        if (isChecked) {
-            if (score === 10) badgeHtml = '<span class="badge" style="background:#059669; color:white;">🟢 참석(운동)</span>';
-            else if (score === 5) badgeHtml = '<span class="badge" style="background:#0284c7; color:white;">🔵 참석</span>';
-            else if (score === 99) badgeHtml = '<span class="badge" style="background:#d97706; color:white;">🟠 대회</span>';
-        }
-
         const info = document.createElement('div');
         info.className = 'member-info';
         const nameDiv = document.createElement('div');
         nameDiv.className = 'member-name';
         const indexStr = displayIndex !== "" ? `<span class="member-index">${displayIndex}.</span>` : "";
         nameDiv.innerHTML = `${indexStr} ${name}`;
-        const badgeDiv = document.createElement('div');
-        badgeDiv.innerHTML = badgeHtml;
         info.appendChild(nameDiv);
-        info.appendChild(badgeDiv);
 
         const buttonGroup = document.createElement('div');
         buttonGroup.className = 'btn-group';
 
-        if (!isChecked) {
-            const btn1 = document.createElement('button');
-            btn1.textContent = '참석(운동)';
-            btn1.addEventListener('click', () => handleCheckIn(name, 10));
-            
-            const btn2 = document.createElement('button');
-            btn2.textContent = '참석';
-            btn2.addEventListener('click', () => handleCheckIn(name, 5));
+        const btn1 = document.createElement('button');
+        btn1.textContent = '참석(운동)';
+        btn1.addEventListener('click', () => handleCheckIn(name, 10));
+        
+        const btn2 = document.createElement('button');
+        btn2.textContent = '참석';
+        btn2.addEventListener('click', () => handleCheckIn(name, 5));
 
-            const btn3 = document.createElement('button');
-            btn3.textContent = '대회';
-            btn3.addEventListener('click', () => handleCheckIn(name, 99));
+        const btn3 = document.createElement('button');
+        btn3.textContent = '대회';
+        btn3.addEventListener('click', () => handleCheckIn(name, 99));
 
-            buttonGroup.appendChild(btn1);
-            buttonGroup.appendChild(btn2);
-            buttonGroup.appendChild(btn3);
-        } else {
-            const selectedBtn = document.createElement('button');
-            if (score === 10) {
-                selectedBtn.textContent = '참석(운동) (+10)';
-                selectedBtn.className = 'selected-10';
-            } else if (score === 5) {
-                selectedBtn.textContent = '참석 (+5)';
-                selectedBtn.className = 'selected-5';
-            } else if (score === 99) {
-                selectedBtn.textContent = '대회 (+10)';
-                selectedBtn.className = 'selected-comp';
-            }
-            selectedBtn.disabled = true;
-            selectedBtn.style.opacity = '0.6';
-            selectedBtn.style.cursor = 'not-allowed';
-
-            const modifyBtn = document.createElement('button');
-            modifyBtn.textContent = '수정';
-            modifyBtn.className = 'btn-modify';
-            modifyBtn.addEventListener('click', () => handleCheckIn(name, 0));
-
-            buttonGroup.appendChild(selectedBtn);
-            buttonGroup.appendChild(modifyBtn);
-        }
+        buttonGroup.appendChild(btn1);
+        buttonGroup.appendChild(btn2);
+        buttonGroup.appendChild(btn3);
 
         card.appendChild(info);
         card.appendChild(buttonGroup);
