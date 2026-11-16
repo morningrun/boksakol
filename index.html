@@ -80,13 +80,21 @@
 
         /* 가로 3분할 출석현황 요약 박스 컨테이너 */
         .checkin-triple-container { display: flex; gap: 6px; margin-bottom: 10px; width: 100%; box-sizing: border-box; padding: 0; }
-        .checkin-column-box { flex: 1; background: #ffffff; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 4px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); box-sizing: border-box; }
-        .checkin-column-title { font-size: 0.82rem; font-weight: 800; text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1.5px solid #e2e8f0; white-space: nowrap; line-height: 1.2; }
-        .checkin-column-sub { font-size: 0.68rem; font-weight: 700; color: var(--text-sub); display: block; margin-top: 1px; }
+        .checkin-column-box { flex: 1; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 4px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); box-sizing: border-box; }
         
-        .checkin-column-names { display: flex; flex-direction: column; gap: 2px; font-size: 0.8rem; font-weight: 600; color: var(--text-main); text-align: left; padding: 0 2px; }
-        .checkin-name-item { background: transparent; padding: 3px 2px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: background 0.15s; display: flex; gap: 4px; }
-        .checkin-name-item:hover { background: #eff6ff; color: var(--accent); }
+        /* 각 박스별 자연스러운 동일 계열 배경색 적용 */
+        .col-workout { background-color: #f0fdf4; border-color: #bbf7d0; }
+        .col-attend { background-color: #f0f9ff; border-color: #bae6fd; }
+        .col-comp { background-color: #fffbeb; border-color: #fde68a; }
+
+        .checkin-column-title { font-size: 0.82rem; font-weight: 800; text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1.5px solid rgba(0,0,0,0.06); white-space: nowrap; line-height: 1.2; }
+        .checkin-column-sub { font-size: 0.68rem; font-weight: 700; opacity: 0.85; display: block; margin-top: 1px; }
+        
+        .checkin-column-names { display: flex; flex-direction: column; gap: 2px; font-size: 0.8rem; font-weight: 600; color: var(--text-main); text-align: left; padding: 0 2px; max-height: 220px; overflow-y: auto; }
+        
+        /* 글씨 박스 배경색을 제거하거나 상위 박스와 동일하게 맞추어 경계선 없이 자연스럽게 일체화 */
+        .checkin-name-item { background: transparent; padding: 3px 2px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: background 0.15s; display: flex; gap: 4px; border: none; box-shadow: none; }
+        .checkin-name-item:hover { background: rgba(0,0,0,0.05); color: var(--accent); }
         .checkin-item-num { color: #64748b; font-size: 0.72rem; font-weight: 700; min-width: 16px; text-align: right; flex-shrink: 0; }
 
         /* 미참석 회원 카드 스타일 */
@@ -664,11 +672,11 @@
         tripleContainer.className = 'checkin-triple-container';
 
         // 1. 참석(운동) 컬럼 (+10점)
-        const colWorkout = createTripleColumn("참석(운동)", "+10", "#059669", workoutList);
+        const colWorkout = createTripleColumn("참석(운동)", "+10", "#059669", "col-workout", workoutList);
         // 2. 참석 컬럼 (+5점)
-        const colAttend = createTripleColumn("참석", "+5", "#0284c7", attendList);
+        const colAttend = createTripleColumn("참석", "+5", "#0284c7", "col-attend", attendList);
         // 3. 대회 컬럼 (+10점)
-        const colComp = createTripleColumn("대회", "+10", "#d97706", compList);
+        const colComp = createTripleColumn("대회", "+10", "#d97706", "col-comp", compList);
 
         tripleContainer.appendChild(colWorkout);
         tripleContainer.appendChild(colAttend);
@@ -690,9 +698,9 @@
         updateSwipeWrapperHeight();
     }
 
-    function createTripleColumn(titleText, subScoreText, colorCode, listData) {
+    function createTripleColumn(titleText, subScoreText, colorCode, boxClassName, listData) {
         const col = document.createElement('div');
-        col.className = 'checkin-column-box';
+        col.className = `checkin-column-box ${boxClassName}`;
         
         const title = document.createElement('div');
         title.className = 'checkin-column-title';
