@@ -80,13 +80,13 @@
 
         /* 가로 3분할 출석현황 요약 박스 컨테이너 */
         .checkin-triple-container { display: flex; gap: 6px; margin-bottom: 10px; width: 100%; box-sizing: border-box; padding: 0; }
-        .checkin-column-box { flex: 1; background: #ffffff; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 4px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); box-sizing: border-box; }
-        .checkin-column-title { font-size: 0.82rem; font-weight: 800; text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1.5px solid #e2e8f0; white-space: nowrap; line-height: 1.2; }
+        .checkin-column-box { flex: 1; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 4px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); box-sizing: border-box; }
+        .checkin-column-title { font-size: 0.82rem; font-weight: 800; text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1.5px solid rgba(0,0,0,0.08); white-space: nowrap; line-height: 1.2; }
         .checkin-column-sub { font-size: 0.68rem; font-weight: 700; color: var(--text-sub); display: block; margin-top: 1px; }
         
         .checkin-column-names { display: flex; flex-direction: column; gap: 2px; font-size: 0.8rem; font-weight: 600; color: var(--text-main); text-align: left; padding: 0 2px; }
         .checkin-name-item { background: transparent; padding: 3px 2px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: background 0.15s; display: flex; gap: 4px; }
-        .checkin-name-item:hover { background: #eff6ff; color: var(--accent); }
+        .checkin-name-item:hover { background: rgba(0,0,0,0.05); }
         .checkin-item-num { color: #64748b; font-size: 0.72rem; font-weight: 700; min-width: 16px; text-align: right; flex-shrink: 0; }
 
         /* 미참석 회원 카드 스타일 */
@@ -663,12 +663,12 @@
         const tripleContainer = document.createElement('div');
         tripleContainer.className = 'checkin-triple-container';
 
-        // 1. 참석(운동) 컬럼 (+10점)
-        const colWorkout = createTripleColumn("참석(운동)", "+10", "#059669", workoutList);
-        // 2. 참석 컬럼 (+5점)
-        const colAttend = createTripleColumn("참석", "+5", "#0284c7", attendList);
-        // 3. 대회 컬럼 (+10점)
-        const colComp = createTripleColumn("대회", "+10", "#d97706", compList);
+        // 1. 참석(운동) 컬럼 (+10점) - 연한 초록빛 배경 (#f0fdf4)
+        const colWorkout = createTripleColumn("참석(운동)", "+10", "#059669", "#f0fdf4", workoutList);
+        // 2. 참석 컬럼 (+5점) - 연한 파란빛 배경 (#eff6ff)
+        const colAttend = createTripleColumn("참석", "+5", "#0284c7", "#eff6ff", attendList);
+        // 3. 대회 컬럼 (+10점) - 연한 주황빛 배경 (#fffbeb)
+        const colComp = createTripleColumn("대회", "+10", "#d97706", "#fffbeb", compList);
 
         tripleContainer.appendChild(colWorkout);
         tripleContainer.appendChild(colAttend);
@@ -690,9 +690,10 @@
         updateSwipeWrapperHeight();
     }
 
-    function createTripleColumn(titleText, subScoreText, colorCode, listData) {
+    function createTripleColumn(titleText, subScoreText, colorCode, bgColorCode, listData) {
         const col = document.createElement('div');
         col.className = 'checkin-column-box';
+        col.style.background = bgColorCode;
         
         const title = document.createElement('div');
         title.className = 'checkin-column-title';
