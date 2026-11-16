@@ -78,7 +78,12 @@
         .sunday-stat-badge { font-size: 0.73rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block; width: fit-content; }
         .sunday-item-btn.active .sunday-stat-badge { background: #dbeafe; color: #1e40af; }
 
-        /* 회원 카드 레이아웃 (상단 이름/뱃지, 하단 가로 버튼 3개 배치) */
+        /* 그룹 박스 스타일 (상단 출석 유형별 세로 모아보기 박스) */
+        .checkin-group-box { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px; margin-bottom: 8px; }
+        .checkin-group-title { font-size: 0.85rem; font-weight: 800; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .checkin-group-list { display: flex; flex-direction: column; gap: 4px; }
+
+        /* 회원 카드 스타일 */
         .member-card { display: flex; flex-direction: column; padding: 6px 8px; margin-bottom: 5px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 7px; gap: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
         .member-card.checked-10 { background-color: #ecfdf5 !important; border-color: #34d399 !important; border-left: 4px solid var(--success) !important; }
         .member-card.checked-5 { background-color: #f0f9ff !important; border-color: #38bdf8 !important; border-left: 4px solid var(--info) !important; }
@@ -151,6 +156,7 @@
                     <input type="text" id="member-search-input" class="search-input" placeholder="🔍 회원 이름 검색..." oninput="renderCheckinList()">
                 </div>
 
+                <!-- 출석체크 리스트 영역 (상단 그룹 박스들 + 미체크 회원 리스트) -->
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
             </div>
 
@@ -609,120 +615,178 @@
         const searchInput = document.getElementById('member-search-input');
         const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
-        const getGroupOrder = (score) => {
-            if (score === 10) return 1;
-            if (score === 5) return 2;
-            if (score === 99) return 3;
-            return 4;
-        };
+        // 검색어가 있을 때는 기존처럼 전체 검색 리스트를 통째로 보여줌
+        if (keyword) {
+            const filteredMembers = [...globalMembers].filter(member => {
+                return String(member.name || "").toLowerCase().includes(keyword);
+            }).sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), 'ko'));
 
-        const sortedMembers = [...globalMembers].filter(member => {
-            if (!keyword) return true;
-            return String(member.name || "").toLowerCase().includes(keyword);
-        }).sort((a, b) => {
-            const nameA = String(a.name || "").trim();
-            const nameB = String(b.name || "").trim();
-            
-            const scoreA = dayAttendance[nameA] || 0;
-            const scoreB = dayAttendance[nameB] || 0;
-
-            const groupA = getGroupOrder(scoreA);
-            const groupB = getGroupOrder(scoreB);
-
-            if (groupA !== groupB) {
-                return groupA - groupB;
+            if (filteredMembers.length === 0) {
+                listDiv.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8; font-weight:700;'>검색된 회원이 없습니다.</div>";
+                updateSwipeWrapperHeight();
+                return;
             }
-            return nameA.localeCompare(nameB, 'ko');
-        });
 
-        if (sortedMembers.length === 0) {
-            listDiv.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8; font-weight:700;'>검색된 회원이 없습니다.</div>";
+            filteredMembers.forEach((member, index) => {
+                listDiv.appendChild(createMemberCard(member, index + 1, dayAttendance));
+            });
             updateSwipeWrapperHeight();
             return;
         }
 
-        sortedMembers.forEach((member, index) => {
+        // 검색어가 없을 때: 유형별 세로 박스(참석(운동), 참석, 대회) + 미체크 회원 리스트
+        const workoutList = []; // 10점 (참석(운동))
+        const attendList = [];  // 5점 (참석)
+        const compList = [];    // 99점 (대회)
+        const uncheckList = []; // 미체크
+
+        globalMembers.forEach(member => {
             const name = String(member.name || "").trim();
-            if (!name) return;
-            
             const score = dayAttendance[name] || 0;
-            const isChecked = [10, 5, 99].includes(score);
-
-            const card = document.createElement('div');
-            let cardClass = 'member-card';
-            if (isChecked) {
-                if (score === 10) cardClass += ' checked-10';
-                else if (score === 5) cardClass += ' checked-5';
-                else if (score === 99) cardClass += ' checked-comp';
-            }
-            card.className = cardClass;
-            
-            let badgeHtml = '';
-            if (isChecked) {
-                if (score === 10) badgeHtml = '<span class="badge" style="background:#059669; color:white;">🟢 참석(운동)</span>';
-                else if (score === 5) badgeHtml = '<span class="badge" style="background:#0284c7; color:white;">🔵 참석</span>';
-                else if (score === 99) badgeHtml = '<span class="badge" style="background:#d97706; color:white;">🟠 대회</span>';
-            }
-
-            const info = document.createElement('div');
-            info.className = 'member-info';
-            const nameDiv = document.createElement('div');
-            nameDiv.className = 'member-name';
-            nameDiv.innerHTML = `<span class="member-index">${index + 1}.</span> ${name}`;
-            const badgeDiv = document.createElement('div');
-            badgeDiv.innerHTML = badgeHtml;
-            info.appendChild(nameDiv);
-            info.appendChild(badgeDiv);
-
-            const buttonGroup = document.createElement('div');
-            buttonGroup.className = 'btn-group';
-
-            if (!isChecked) {
-                const btn1 = document.createElement('button');
-                btn1.textContent = '참석(운동)';
-                btn1.addEventListener('click', () => handleCheckIn(name, 10));
-                
-                const btn2 = document.createElement('button');
-                btn2.textContent = '참석';
-                btn2.addEventListener('click', () => handleCheckIn(name, 5));
-
-                const btn3 = document.createElement('button');
-                btn3.textContent = '대회';
-                btn3.addEventListener('click', () => handleCheckIn(name, 99));
-
-                buttonGroup.appendChild(btn1);
-                buttonGroup.appendChild(btn2);
-                buttonGroup.appendChild(btn3);
-            } else {
-                const selectedBtn = document.createElement('button');
-                if (score === 10) {
-                    selectedBtn.textContent = '참석(운동) (+10)';
-                    selectedBtn.className = 'selected-10';
-                } else if (score === 5) {
-                    selectedBtn.textContent = '참석 (+5)';
-                    selectedBtn.className = 'selected-5';
-                } else if (score === 99) {
-                    selectedBtn.textContent = '대회 (+10)';
-                    selectedBtn.className = 'selected-comp';
-                }
-                selectedBtn.disabled = true;
-                selectedBtn.style.opacity = '0.6';
-                selectedBtn.style.cursor = 'not-allowed';
-
-                const modifyBtn = document.createElement('button');
-                modifyBtn.textContent = '수정';
-                modifyBtn.className = 'btn-modify';
-                modifyBtn.addEventListener('click', () => handleCheckIn(name, 0));
-
-                buttonGroup.appendChild(selectedBtn);
-                buttonGroup.appendChild(modifyBtn);
-            }
-
-            card.appendChild(info);
-            card.appendChild(buttonGroup);
-            listDiv.appendChild(card);
+            if (score === 10) workoutList.push(member);
+            else if (score === 5) attendList.push(member);
+            else if (score === 99) compList.push(member);
+            else uncheckList.push(member);
         });
+
+        // 가나다순 정렬
+        workoutList.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+        attendList.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+        compList.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+        uncheckList.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+
+        // 1. 참석(운동) 그룹 박스
+        if (workoutList.length > 0) {
+            const box = document.createElement('div');
+            box.className = 'checkin-group-box';
+            box.innerHTML = `<div class="checkin-group-title" style="color:#059669;">🟢 참석(운동) 완료 (${workoutList.length}명)</div>`;
+            const innerList = document.createElement('div');
+            innerList.className = 'checkin-group-list';
+            workoutList.forEach(m => innerList.appendChild(createMemberCard(m, "", dayAttendance)));
+            box.appendChild(innerList);
+            listDiv.appendChild(box);
+        }
+
+        // 2. 참석 그룹 박스
+        if (attendList.length > 0) {
+            const box = document.createElement('div');
+            box.className = 'checkin-group-box';
+            box.innerHTML = `<div class="checkin-group-title" style="color:#0284c7;">🔵 참석 완료 (${attendList.length}명)</div>`;
+            const innerList = document.createElement('div');
+            innerList.className = 'checkin-group-list';
+            attendList.forEach(m => innerList.appendChild(createMemberCard(m, "", dayAttendance)));
+            box.appendChild(innerList);
+            listDiv.appendChild(box);
+        }
+
+        // 3. 대회 그룹 박스
+        if (compList.length > 0) {
+            const box = document.createElement('div');
+            box.className = 'checkin-group-box';
+            box.innerHTML = `<div class="checkin-group-title" style="color:#d97706;">🟠 대회 출전 (${compList.length}명)</div>`;
+            const innerList = document.createElement('div');
+            innerList.className = 'checkin-group-list';
+            compList.forEach(m => innerList.appendChild(createMemberCard(m, "", dayAttendance)));
+            box.appendChild(innerList);
+            listDiv.appendChild(box);
+        }
+
+        // 4. 미체크 회원 리스트 (현행 툴 유지)
+        if (uncheckList.length > 0) {
+            const titleDiv = document.createElement('div');
+            titleDiv.style.cssText = "font-size:0.85rem; font-weight:800; color:var(--text-sub); margin:10px 0 6px 2px;";
+            titleDiv.textContent = `📋 미체크 회원 (${uncheckList.length}명)`;
+            listDiv.appendChild(titleDiv);
+
+            uncheckList.forEach(m => {
+                // 전체 회원 번호 인덱스 찾기
+                const origIndex = globalMembers.findIndex(item => item.name === m.name) + 1;
+                listDiv.appendChild(createMemberCard(m, origIndex, dayAttendance));
+            });
+        }
+
         updateSwipeWrapperHeight();
+    }
+
+    function createMemberCard(member, displayIndex, dayAttendance) {
+        const name = String(member.name || "").trim();
+        const score = dayAttendance[name] || 0;
+        const isChecked = [10, 5, 99].includes(score);
+
+        const card = document.createElement('div');
+        let cardClass = 'member-card';
+        if (isChecked) {
+            if (score === 10) cardClass += ' checked-10';
+            else if (score === 5) cardClass += ' checked-5';
+            else if (score === 99) cardClass += ' checked-comp';
+        }
+        card.className = cardClass;
+        
+        let badgeHtml = '';
+        if (isChecked) {
+            if (score === 10) badgeHtml = '<span class="badge" style="background:#059669; color:white;">🟢 참석(운동)</span>';
+            else if (score === 5) badgeHtml = '<span class="badge" style="background:#0284c7; color:white;">🔵 참석</span>';
+            else if (score === 99) badgeHtml = '<span class="badge" style="background:#d97706; color:white;">🟠 대회</span>';
+        }
+
+        const info = document.createElement('div');
+        info.className = 'member-info';
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'member-name';
+        const indexStr = displayIndex !== "" ? `<span class="member-index">${displayIndex}.</span>` : "";
+        nameDiv.innerHTML = `${indexStr} ${name}`;
+        const badgeDiv = document.createElement('div');
+        badgeDiv.innerHTML = badgeHtml;
+        info.appendChild(nameDiv);
+        info.appendChild(badgeDiv);
+
+        const buttonGroup = document.createElement('div');
+        buttonGroup.className = 'btn-group';
+
+        if (!isChecked) {
+            const btn1 = document.createElement('button');
+            btn1.textContent = '참석(운동)';
+            btn1.addEventListener('click', () => handleCheckIn(name, 10));
+            
+            const btn2 = document.createElement('button');
+            btn2.textContent = '참석';
+            btn2.addEventListener('click', () => handleCheckIn(name, 5));
+
+            const btn3 = document.createElement('button');
+            btn3.textContent = '대회';
+            btn3.addEventListener('click', () => handleCheckIn(name, 99));
+
+            buttonGroup.appendChild(btn1);
+            buttonGroup.appendChild(btn2);
+            buttonGroup.appendChild(btn3);
+        } else {
+            const selectedBtn = document.createElement('button');
+            if (score === 10) {
+                selectedBtn.textContent = '참석(운동) (+10)';
+                selectedBtn.className = 'selected-10';
+            } else if (score === 5) {
+                selectedBtn.textContent = '참석 (+5)';
+                selectedBtn.className = 'selected-5';
+            } else if (score === 99) {
+                selectedBtn.textContent = '대회 (+10)';
+                selectedBtn.className = 'selected-comp';
+            }
+            selectedBtn.disabled = true;
+            selectedBtn.style.opacity = '0.6';
+            selectedBtn.style.cursor = 'not-allowed';
+
+            const modifyBtn = document.createElement('button');
+            modifyBtn.textContent = '수정';
+            modifyBtn.className = 'btn-modify';
+            modifyBtn.addEventListener('click', () => handleCheckIn(name, 0));
+
+            buttonGroup.appendChild(selectedBtn);
+            buttonGroup.appendChild(modifyBtn);
+        }
+
+        card.appendChild(info);
+        card.appendChild(buttonGroup);
+        return card;
     }
 
     async function handleCheckIn(name, score) {
