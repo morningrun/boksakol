@@ -37,7 +37,7 @@
         }
 
         html { width: 100%; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 6px; color: var(--text-main); -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 6px; color: var(--text-main); -webkit-tap-highlight-color: transparent; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
         
         .container { max-width: 600px; width: 100%; box-sizing: border-box; margin: 0 auto; background: var(--card-bg); padding: 10px; border-radius: 12px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08); }
         
@@ -78,18 +78,20 @@
         .sunday-stat-badge { font-size: 0.73rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block; width: fit-content; }
         .sunday-item-btn.active .sunday-stat-badge { background: #dbeafe; color: #1e40af; }
 
-        /* 가로 3분할 출석현황 요약 박스 컨테이너 */
-        .checkin-triple-container { display: flex; gap: 5px; margin-bottom: 10px; width: 100%; box-sizing: border-box; }
-        .checkin-column-box { flex: 1; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; min-width: 0; }
-        .checkin-column-title { font-size: 0.78rem; font-weight: 800; text-align: center; margin-bottom: 5px; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-        .checkin-column-names { display: flex; flex-direction: column; gap: 3px; max-height: 150px; overflow-y: auto; font-size: 0.78rem; font-weight: 700; color: var(--text-main); text-align: center; }
-        .checkin-name-item { background: #ffffff; padding: 3px 2px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+        /* 가로 3분할 출석현황 요약 박스 컨테이너 (넓게 확장) */
+        .checkin-triple-container { display: flex; gap: 6px; margin-bottom: 10px; width: 100%; box-sizing: border-box; }
+        .checkin-column-box { flex: 1; background: #ffffff; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 4px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .checkin-column-title { font-size: 0.82rem; font-weight: 800; text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1.5px solid #e2e8f0; white-space: nowrap; }
+        
+        /* 세로 높이 제한 해제 및 깔끔한 텍스트 나열 (개별 박스선 제거) */
+        .checkin-column-names { display: flex; flex-direction: column; gap: 2px; font-size: 0.82rem; font-weight: 600; color: var(--text-main); text-align: center; }
+        .checkin-name-item { background: transparent; padding: 3px 2px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: background 0.15s; }
         .checkin-name-item:hover { background: #eff6ff; color: var(--accent); }
 
         /* 미체크 회원 카드 스타일 (현행 유지) */
         .member-card { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; margin-bottom: 5px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 7px; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
         .member-info { display: flex; align-items: center; gap: 6px; flex-shrink: 0; min-width: 95px; }
-        .member-name { font-weight: 800; font-size: 0.9rem; color: var(--primary); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .member-name { font-weight: 700; font-size: 0.9rem; color: var(--primary); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
         .member-index { font-size: 0.72rem; color: #64748b; font-weight: 700; width: 20px; text-align: right; }
         
         .btn-group { display: flex; gap: 3px; flex: 1; justify-content: flex-end; }
@@ -149,7 +151,7 @@
                     <input type="text" id="member-search-input" class="search-input" placeholder="🔍 회원 이름 검색..." oninput="renderCheckinList()">
                 </div>
 
-                <!-- 출석체크 리스트 영역 (상단 가로 3분할 박스 + 하단 미체크 회원 리스트) -->
+                <!-- 출석체크 리스트 영역 (상단 가로 3분할 넓은 박스 + 하단 미체크 회원 리스트) -->
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
             </div>
 
@@ -667,7 +669,7 @@
         // 하단 미체크 회원 리스트 (현행 툴 유지)
         if (uncheckList.length > 0) {
             const titleDiv = document.createElement('div');
-            titleDiv.style.cssText = "font-size:0.85rem; font-weight:800; color:var(--text-sub); margin:12px 0 6px 2px;";
+            titleDiv.style.cssText = "font-size:0.85rem; font-weight:800; color:var(--text-sub); margin:14px 0 6px 2px;";
             titleDiv.textContent = `📋 미체크 회원 (${uncheckList.length}명)`;
             listDiv.appendChild(titleDiv);
 
@@ -694,13 +696,12 @@
         namesWrapper.className = 'checkin-column-names';
 
         if (listData.length === 0) {
-            namesWrapper.innerHTML = `<div style="color:#94a3b8; font-size:0.72rem; padding:10px 0;">없음</div>`;
+            namesWrapper.innerHTML = `<div style="color:#94a3b8; font-size:0.75rem; padding:8px 0;">없음</div>`;
         } else {
             listData.forEach(m => {
                 const nameItem = document.createElement('div');
                 nameItem.className = 'checkin-name-item';
                 nameItem.textContent = m.name;
-                // 이름을 클릭하면 해당 회원의 출석 기록 수정(취소) 팝업 창이 뜨도록 연동
                 nameItem.title = "클릭하여 기록 수정/취소";
                 nameItem.addEventListener('click', () => handleCheckIn(m.name, 0));
                 namesWrapper.appendChild(nameItem);
