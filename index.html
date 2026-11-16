@@ -78,7 +78,7 @@
         .sunday-stat-badge { font-size: 0.73rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block; width: fit-content; }
         .sunday-item-btn.active .sunday-stat-badge { background: #dbeafe; color: #1e40af; }
 
-        /* 가로 3분할 출석현황 요약 박스 컨테이너 (상단 검색창과 폭 및 마진 일치) */
+        /* 가로 3분할 출석현황 요약 박스 컨테이너 */
         .checkin-triple-container { display: flex; gap: 6px; margin-bottom: 10px; width: 100%; box-sizing: border-box; padding: 0; }
         .checkin-column-box { flex: 1; background: #ffffff; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 4px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); box-sizing: border-box; }
         .checkin-column-title { font-size: 0.82rem; font-weight: 800; text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1.5px solid #e2e8f0; white-space: nowrap; line-height: 1.2; }
@@ -89,7 +89,7 @@
         .checkin-name-item:hover { background: #eff6ff; color: var(--accent); }
         .checkin-item-num { color: #64748b; font-size: 0.72rem; font-weight: 700; min-width: 16px; text-align: right; flex-shrink: 0; }
 
-        /* 미체크 회원 카드 스타일 (검색창과 폭 일치) */
+        /* 미참석 회원 카드 스타일 */
         .member-card { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; margin-bottom: 5px; background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 7px; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); width: 100%; box-sizing: border-box; }
         .member-info { display: flex; align-items: center; gap: 6px; flex-shrink: 0; min-width: 95px; }
         .member-name { font-weight: 700; font-size: 0.9rem; color: var(--primary); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
@@ -152,7 +152,7 @@
                     <input type="text" id="member-search-input" class="search-input" placeholder="🔍 회원 이름 검색..." oninput="renderCheckinList()">
                 </div>
 
-                <!-- 출석체크 리스트 영역 (상단 검색창과 폭이 일치하는 3분할 박스 + 하단 미체크 회원 리스트) -->
+                <!-- 출석체크 리스트 영역 -->
                 <div id="member-list" class="loading">데이터 로딩 중...</div>
             </div>
 
@@ -630,11 +630,11 @@
             return;
         }
 
-        // 검색어가 없을 때: 상단 가로 3분할 박스 (추가 점수 포함) + 하단 미체크 회원 리스트 (각각 번호 부여)
+        // 검색어가 없을 때: 참석회원 타이틀 + 상단 가로 3분할 박스 + 미참석회원 타이틀 + 하단 미참석 회원 리스트
         const workoutList = []; // 10점 (참석(운동))
         const attendList = [];  // 5점 (참석)
         const compList = [];    // 99점 (대회)
-        const uncheckList = []; // 미체크
+        const uncheckList = []; // 미참석
 
         globalMembers.forEach(member => {
             const name = String(member.name || "").trim();
@@ -651,7 +651,15 @@
         compList.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
         uncheckList.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
 
-        // 상단 가로 3분할 컨테이너 생성 (검색창과 동일한 너비 및 박스 정렬)
+        const totalCheckCount = workoutList.length + attendList.length + compList.length;
+
+        // 참석회원 타이틀 추가
+        const checkTitleDiv = document.createElement('div');
+        checkTitleDiv.style.cssText = "font-size:0.85rem; font-weight:800; color:var(--text-main); margin:4px 0 6px 0;";
+        checkTitleDiv.textContent = `✅ 참석회원 (${totalCheckCount}명)`;
+        listDiv.appendChild(checkTitleDiv);
+
+        // 상단 가로 3분할 컨테이너 생성
         const tripleContainer = document.createElement('div');
         tripleContainer.className = 'checkin-triple-container';
 
@@ -667,12 +675,12 @@
         tripleContainer.appendChild(colComp);
         listDiv.appendChild(tripleContainer);
 
-        // 하단 미체크 회원 리스트 (각각 1번부터 번호 매김)
+        // 하단 미참석 회원 리스트 (타이틀 + 각각 번호 부여)
         if (uncheckList.length > 0) {
-            const titleDiv = document.createElement('div');
-            titleDiv.style.cssText = "font-size:0.85rem; font-weight:800; color:var(--text-sub); margin:14px 0 6px 0;";
-            titleDiv.textContent = `📋 미체크 회원 (${uncheckList.length}명)`;
-            listDiv.appendChild(titleDiv);
+            const uncheckTitleDiv = document.createElement('div');
+            uncheckTitleDiv.style.cssText = "font-size:0.85rem; font-weight:800; color:var(--text-sub); margin:14px 0 6px 0;";
+            uncheckTitleDiv.textContent = `📋 미참석회원 (${uncheckList.length}명)`;
+            listDiv.appendChild(uncheckTitleDiv);
 
             uncheckList.forEach((m, idx) => {
                 listDiv.appendChild(createMemberCard(m, idx + 1, dayAttendance));
