@@ -78,24 +78,25 @@
         .sunday-stat-badge { font-size: 0.73rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block; width: fit-content; }
         .sunday-item-btn.active .sunday-stat-badge { background: #dbeafe; color: #1e40af; }
 
-        /* 회원 카드 슬림화 (세로 높이 및 여백 축소) */
-        .member-card { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; margin-bottom: 4px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 7px; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        /* 회원 카드 최적화 (모바일 화면 이탈 방지) */
+        .member-card { display: flex; flex-direction: column; padding: 6px 8px; margin-bottom: 5px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 7px; gap: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
         .member-card.checked-10 { background-color: #ecfdf5 !important; border-color: #34d399 !important; border-left: 4px solid var(--success) !important; }
         .member-card.checked-5 { background-color: #f0f9ff !important; border-color: #38bdf8 !important; border-left: 4px solid var(--info) !important; }
         .member-card.checked-comp { background-color: #fffbeb !important; border-color: #fbbf24 !important; border-left: 4px solid var(--warning) !important; }
 
-        .member-info { display: flex; align-items: center; gap: 6px; flex-shrink: 0; min-width: 95px; }
-        .member-name { font-weight: 800; font-size: 0.9rem; color: var(--primary); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-        .member-index { font-size: 0.72rem; color: #64748b; font-weight: 700; width: 20px; text-align: right; }
+        .member-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .member-name { font-weight: 800; font-size: 0.88rem; color: var(--primary); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .member-index { font-size: 0.72rem; color: #64748b; font-weight: 700; width: 22px; text-align: right; }
         .badge { font-size: 0.7rem; font-weight: 800; padding: 1px 5px; border-radius: 4px; white-space: nowrap; }
         
-        .btn-group { display: flex; gap: 4px; flex: 1; justify-content: flex-end; }
-        .btn-group button { padding: 6px 4px; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 5px; cursor: pointer; font-weight: 700; background: #f8fafc; color: var(--text-sub); text-align: center; white-space: nowrap; }
+        /* 버튼 그룹 컴팩트 배치 (모바일 스크린 안으로 완전 수용) */
+        .btn-group { display: flex; gap: 3px; width: 100%; }
+        .btn-group button { flex: 1; padding: 6px 2px; font-size: 0.72rem; border: 1px solid var(--border); border-radius: 5px; cursor: pointer; font-weight: 700; background: #f8fafc; color: var(--text-sub); text-align: center; white-space: nowrap; }
         
         button.selected-10 { background: var(--success) !important; color: white !important; border-color: var(--success) !important; font-weight: 800; flex: 1; }
         button.selected-5 { background: var(--info) !important; color: white !important; border-color: var(--info) !important; font-weight: 800; flex: 1; }
         button.selected-comp { background: var(--warning) !important; color: white !important; border-color: var(--warning) !important; font-weight: 800; flex: 1; }
-        button.btn-modify { background: #fee2e2 !important; color: var(--danger) !important; border-color: #fca5a5 !important; font-weight: 800; width: 42px; flex: unset !important; }
+        button.btn-modify { background: #fee2e2 !important; color: var(--danger) !important; border-color: #fca5a5 !important; font-weight: 800; width: 45px; flex: unset !important; }
 
         .rank-card { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px; margin-bottom: 6px; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 8px; gap: 4px; }
         .rank-number { font-weight: 800; color: var(--accent); width: 36px; font-size: 0.8rem; white-space: nowrap; flex-shrink: 0; }
@@ -678,15 +679,15 @@
 
             if (!isChecked) {
                 const btn1 = document.createElement('button');
-                btn1.textContent = '참석(운동) (+10)';
+                btn1.textContent = '참석(운동)';
                 btn1.addEventListener('click', () => handleCheckIn(name, 10));
                 
                 const btn2 = document.createElement('button');
-                btn2.textContent = '참석 (+5)';
+                btn2.textContent = '참석';
                 btn2.addEventListener('click', () => handleCheckIn(name, 5));
 
                 const btn3 = document.createElement('button');
-                btn3.textContent = '대회 (+10)';
+                btn3.textContent = '대회';
                 btn3.addEventListener('click', () => handleCheckIn(name, 99));
 
                 buttonGroup.appendChild(btn1);
@@ -915,12 +916,16 @@
 
             if (Math.abs(diff) > 40) {
                 if (diff > 0 && activePaneIndex < 1) {
-                    switchTab(activePaneIndex + 1);
+                    switch_tab_safe(activePaneIndex + 1);
                 } else if (diff < 0 && activePaneIndex > 0) {
-                    switchTab(activePaneIndex - 1);
+                    switch_tab_safe(activePaneIndex - 1);
                 }
             }
         });
+    }
+
+    function switch_tab_safe(idx) {
+        switchTab(idx);
     }
 
     async function initApp() {
@@ -936,7 +941,6 @@
         renderStats();
     }
 
-    /참조사항 유지 실행/
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initApp);
     } else {
@@ -946,3 +950,8 @@
 
 </body>
 </html>
+```[cite: 1, 2]
+
+### 🛠️ 주요 개선 내용:
+1. **버튼 텍스트 간소화**: 공간이 부족한 모바일 화면에 맞추어 미체크 상태의 버튼 글자를 `참석(운동) (+10)`에서 직관적인 **`참석(운동)`**, **`참석`**, **`대회`**로 줄여 가로 폭을 최적화했습니다.
+2. **카드 레이아웃 구조 변경**: 이름/번호 영역을 위쪽 줄에 배치하고, 3개의 출석체크 버튼을 아래쪽 줄에 꽉 차게 나란히 배치하여 스마트폰 화면 밖으로 밀려 나가지 않도록 완벽하게 수용했습니다.
